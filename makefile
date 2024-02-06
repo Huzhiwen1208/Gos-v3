@@ -10,23 +10,19 @@ LdFlags=-m elf_i386 -static
 TARGET=target
 BootLoader=src/bootloader
 KernelPath=src/kernel
-UserPath=src/user
 
 ELFKernel=$(TARGET)/kernel/os.elf
 NakedKernel=$(TARGET)/kernel/os.bin
 KernelSourceFile=$(wildcard $(KernelPath)/*.c) $(wildcard $(KernelPath)/*.asm)
 KernelSourceFile+=$(wildcard $(KernelPath)/*/*.c) $(wildcard $(KernelPath)/*/*.asm)
-UserSourceFile=$(wildcard $(UserPath)/*.c)
 
 KernelOBJ=$(patsubst $(KernelPath)/%.asm, $(TARGET)/kernel/%.o, $(filter %.asm, $(KernelSourceFile)))
 KernelOBJ+=$(patsubst $(KernelPath)/%.c, $(TARGET)/kernel/%.o, $(filter %.c, $(KernelSourceFile)))
-UserOBJ=$(patsubst $(UserPath)/%.c, $(TARGET)/user/%.o, $(filter %.c, $(UserSourceFile)))
 ENTRYPOINT=0x7e00
 
 run: build
 	qemu-system-i386 -m 32M \
-		-drive file=img/gos.img,if=ide,index=0,media=disk,format=raw \
-		-drive file=img/fs.img,if=ide,index=1,media=disk,format=raw
+		-drive file=img/gos.img,if=ide,index=0,media=disk,format=raw
 
 build: $(TARGET) $(IMG)
 
@@ -35,19 +31,6 @@ $(TARGET):
 ifeq ($(wildcard $(TARGET)),)
 	@mkdir -p $(TARGET)/bootloader
 	@mkdir -p $(TARGET)/kernel
-	@mkdir -p $(TARGET)/kernel/common
-	@mkdir -p $(TARGET)/kernel/console
-	@mkdir -p $(TARGET)/kernel/lib
-	@mkdir -p $(TARGET)/kernel/memory
-	@mkdir -p $(TARGET)/kernel/ds
-	@mkdir -p $(TARGET)/kernel/int
-	@mkdir -p $(TARGET)/kernel/descriptor
-	@mkdir -p $(TARGET)/kernel/process
-	@mkdir -p $(TARGET)/kernel/syscall
-	@mkdir -p $(TARGET)/user
-	@mkdir -p $(TARGET)/kernel/device
-	@mkdir -p $(TARGET)/kernel/disk
-	@mkdir -p $(TARGET)/kernel/fs
 endif
 
 # .c, .asm ---> .o ------
@@ -85,15 +68,11 @@ endif
 ifeq ($(wildcard $(IMG)),)
 	bximage -q -hd=16 -mode=create -sectsize=512 -imgmode=flat $(IMG)
 endif
-ifeq ($(wildcard $(FSImage)),)
-	bximage -q -hd=64 -mode=create -sectsize=512 -imgmode=flat $(FSImage)
-endif
 # ------- img made
 
 debug: build 
 	qemu-system-i386 -m 32M \
 		-drive file=img/gos.img,if=ide,index=0,media=disk,format=raw \
-		-drive file=img/fs.img,if=ide,index=1,media=disk,format=raw \
 		-s -S
 
 .PHONY: clean
