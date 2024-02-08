@@ -1,7 +1,6 @@
 AsmCompile=nasm
 CCompile=gcc
 IMG=img/gos.img
-FSImage=img/fs.img
 
 GccFlags=-m32 -fno-builtin -fno-stack-protector -march=pentium
 GccFlags+=-w -nostdinc -nostdlib -fno-pic -fno-pie -g
