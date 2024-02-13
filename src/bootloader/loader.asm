@@ -2,9 +2,6 @@
 [org 0x500]
 GPU equ 0xb800; 文本显示器内存段
 
-mov ax, 3
-int 0x10
-
 mov ax, GPU
 mov es, ax; es->GPU, extra segment
 
@@ -18,10 +15,6 @@ call memory_checkout
 call protect_mode
 
 jmp $
-
-mbgsdl:
-    db "mian bao ge shi da lao!"
-mbgsdl_end:
 
 print:
     push ax

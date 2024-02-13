@@ -1,13 +1,34 @@
-[org 0x7c00] ; 加载到内存的0x7c00，声明，不是要求
+GPU equ 0xb800
 
-mov edi, 0x1000 ; 加载到内存0x500中
-mov ecx, 260 ; 从第260块开始加载
-mov bl, 1 ; 加载三块
+mov ax, 3
+int 0x10
+
+mov ax, GPU
+mov es, ax
+
+; mov si, message
+; call print
+
+mov edi, 0x500 ; 加载到内存0x500中
+mov ecx, 1 ; 从第二块开始加载
+mov bl, 3 ; 加载三块
 call read_disk
-
-jmp 0:0x1000
-
+jmp 0:0x500
 ud2
+
+print:
+    push ax
+    mov ah, 0xe
+    .write:
+        mov al, [si]
+        cmp al, 0
+        jz .done
+        int 0x10
+        inc si
+        jmp .write
+    .done:
+        pop ax
+        ret
 
 read_disk:
     ; edi - 准备加载到的内存地址起址
@@ -84,6 +105,3 @@ read_disk:
         add edi, 2
         loop .readw
     ret
-
-times 510 - ($ - $$) db 0
-db 0x55, 0xaa
