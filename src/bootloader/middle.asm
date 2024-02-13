@@ -1,3 +1,5 @@
+[org 0x1000]
+
 GPU equ 0xb800
 
 mov ax, 3
@@ -6,8 +8,8 @@ int 0x10
 mov ax, GPU
 mov es, ax
 
-; mov si, message
-; call print
+mov si, message
+call print
 
 mov edi, 0x500 ; 加载到内存0x500中
 mov ecx, 1 ; 从第二块开始加载
@@ -15,6 +17,9 @@ mov bl, 3 ; 加载三块
 call read_disk
 jmp 0:0x500
 ud2
+
+message:
+    db "Hello, this is middle task", 10, 13, 0
 
 print:
     push ax
