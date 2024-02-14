@@ -30,6 +30,8 @@ $(TARGET):
 ifeq ($(wildcard $(TARGET)),)
 	@mkdir -p $(TARGET)/bootloader
 	@mkdir -p $(TARGET)/kernel
+	@mkdir -p $(TARGET)/kernel/common
+	@mkdir -p $(TARGET)/kernel/console
 endif
 
 # .c, .asm ---> .o ------
