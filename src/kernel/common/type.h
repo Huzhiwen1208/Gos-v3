@@ -19,4 +19,7 @@ typedef unsigned int Size;
 
 typedef unsigned int PhysicalAddress;
 
+// 可变参数列表
+typedef char* va_list;
+
 #define StructNotAlign __attribute__((packed));
