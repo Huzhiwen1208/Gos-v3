@@ -8,7 +8,7 @@
 
 typedef struct FrameAllocator {
     /* Pages[i]: 0b00000xxx;
-        x0: 0 means free, 1 means used
+        x0: 1 means free, 0 means used
         x1: 0 means kernel, 1 means user
         x2: 0 means not dirty, 1 means dirty
     */

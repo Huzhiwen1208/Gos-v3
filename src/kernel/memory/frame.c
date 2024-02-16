@@ -108,7 +108,7 @@ static void globalFrameAllocatorInit() {
     frameAllocator.KernelFreePageCount = 0;
     for (Size i = 0; i < MAX_PAGE_COUNT; i++) {
         if (i < 1024) { // 4MB
-            frameAllocator.Pages[i] = 0b00000011; // 0b00000001 means free and belong to kernel
+            frameAllocator.Pages[i] = 0b00000011; // 0b00000011 means free and belong to kernel
             continue;
         }
 
