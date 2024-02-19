@@ -19,7 +19,3 @@ void MemoryCheckout(PhysicalAddress* ardCountAddress);
 // Buddy
 PhysicalAddress Malloc(Size size);
 void Free(PhysicalAddress address);
-
-// Stable
-PhysicalAddress StableMalloc(Size size);
-void StableFree(PhysicalAddress address);
