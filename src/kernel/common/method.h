@@ -19,3 +19,5 @@ Boolean IsDigit(char c);
 Boolean IsAlpha(char c);
 Boolean IsUpper(char c);
 Boolean IsLower(char c);
+
+void Suspend();

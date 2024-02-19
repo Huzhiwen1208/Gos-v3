@@ -107,3 +107,8 @@ Boolean IsUpper(char c) {
 Boolean IsLower(char c) {
     return c >= 'a' && c <= 'z';
 }
+
+void Suspend() {
+    while (1)
+        asm volatile ("hlt");
+}

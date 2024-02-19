@@ -18,5 +18,15 @@ typedef char* String;
 typedef unsigned int Size;
 
 typedef unsigned int PhysicalAddress;
+typedef unsigned int PhysicalPageNumber;
+
+// 可变参数列表
+typedef char* va_list;
 
 #define StructNotAlign __attribute__((packed));
+
+// 机器模式
+typedef enum MachineMode {
+    KernelMode,
+    UserMode
+} MachineMode;
