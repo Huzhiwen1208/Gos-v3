@@ -2,6 +2,7 @@
 
 #include "../common/type.h"
 #include "../console/type.h"
+#include "../int/type.h"
 
 #define stack_size(t) (sizeof(t) <= sizeof(char *) ? sizeof(char *) : sizeof(t))
 #define va_start(ap, v) (ap = (va_list)&v + sizeof(char *))

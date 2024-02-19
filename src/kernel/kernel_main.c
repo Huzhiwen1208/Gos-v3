@@ -2,6 +2,7 @@
 #include "lib/mod.h"
 #include "console/mod.h"
 #include "memory/mod.h"
+#include "int/mod.h"
 
 void KernelMain() {
     // 清空屏幕，初始化控制台
@@ -12,4 +13,9 @@ void KernelMain() {
 
     // 初始化内存管理
     InitMemoryManager();
+
+    // 初始化中断异常处理
+    InitializeInterrupt();
+
+    SyscallTest();
 }
