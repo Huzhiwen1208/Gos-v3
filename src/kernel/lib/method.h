@@ -24,3 +24,6 @@ void ErrorHandle(const char *file, i32 line, const char *fmt, ...);
 #define Info(fmt, ...) InfoHandle(__FILE__, __LINE__, fmt, ##__VA_ARGS__)
 #define Warn(fmt, ...) WarnHandle(__FILE__, __LINE__, fmt, ##__VA_ARGS__)
 #define Error(fmt, ...) ErrorHandle(__FILE__, __LINE__, fmt, ##__VA_ARGS__)
+
+void SyscallTest();
+void SyscallLab2();
