@@ -86,6 +86,7 @@ void globalBuddyAllocatorInit() {
 
 void InitMemoryManager() {
     globalBuddyAllocatorInit();
+    globalStableAllocatorInit();
 }
 
 
