@@ -14,7 +14,12 @@ static void setCursor(Cursor cursor);
 /// @brief 清屏操作
 static void clearScreen();
 /// @brief 如果当前行被写过，则换行
-static void ConsoleAlignLine();
+void ConsoleAlignLine() {
+    Cursor cursor = getCursor();
+    if (cursor.Col != 0) {
+        ConsoleWriteWithColor("\n", 1, WHITE);
+    }
+}
 
 Size ConsoleWriteWithColor(const char* buf, Size len, ConsoleColor color) {
     if (color != WHITE && color != LIGHT_BLUE) {
@@ -143,11 +148,4 @@ static void clearScreen() {
 static Cursor newCursor(u32 row, u32 col) {
     Cursor cursor = {row, col};
     return cursor;
-}
-
-static void ConsoleAlignLine() {
-    Cursor cursor = getCursor();
-    if (cursor.Col != 0) {
-        ConsoleWriteWithColor("\n", 1, WHITE);
-    }
 }
