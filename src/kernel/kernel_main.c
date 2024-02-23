@@ -3,6 +3,12 @@
 #include "console/mod.h"
 #include "memory/mod.h"
 #include "int/mod.h"
+#include "process/mod.h"
+
+void testProcess() {
+    Printf("Hello, World! This is a test process\n");
+    while (1);
+}
 
 void KernelMain() {
     // 清空屏幕，初始化控制台
@@ -17,5 +23,8 @@ void KernelMain() {
     // 初始化中断异常处理
     InitializeInterrupt();
 
-    SyscallTest();
+    // 初始化进程管理
+    InitializeProcessManager();
+    CreateKernelProcess(testProcess);
+    Schedule();
 }
