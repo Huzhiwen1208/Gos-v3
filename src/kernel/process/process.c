@@ -16,6 +16,7 @@ void InitializeProcessManager() {
     for (int i = 0; i < MAX_PROCESS_COUNT; i++) {
         processManager.RunnableProcesses[i] = NULL;
     }
+    processManager.Front = processManager.Rear = 0;
     CreateKernelProcess(idle);
     idleProcess = fetchProcess();
 }
@@ -39,14 +40,15 @@ PCB* GetCurrentProcess() {
     return processManager.Current;
 }
 
+/// @brief 入队，进入就绪队列
+/// @param process 
 void AddProcess(PCB* process) {
-    for (int i = 0; i < MAX_PROCESS_COUNT; i++)
-        if (processManager.RunnableProcesses[i] == NULL) {
-            processManager.RunnableProcesses[i] = process;
-            return;
-        }
-    
-    Panic("Too many processes");
+    if ((processManager.Rear + 1) % MAX_PROCESS_COUNT == processManager.Front) {
+        Panic("Queue is full");
+    }
+
+    processManager.RunnableProcesses[processManager.Rear] = process;
+    processManager.Rear = (processManager.Rear + 1) % MAX_PROCESS_COUNT;
 }
 
 void Schedule() {
@@ -88,14 +90,15 @@ static void runFirstProcess() {
 }
 
 static PCB* fetchProcess() {
-    for (int i = 0; i < MAX_PROCESS_COUNT; i++) {
-        if (processManager.RunnableProcesses[i] != NULL) {
-            PCB* process = processManager.RunnableProcesses[i];
-            processManager.RunnableProcesses[i] = NULL;
-            return process;
-        }
+    if (isEmpty()) {
+        Panic("Queue is empty");
     }
-    return NULL;
+
+    PCB* result = processManager.RunnableProcesses[processManager.Front];
+    processManager.RunnableProcesses[processManager.Front] = NULL;
+    processManager.Front = (processManager.Front + 1 ) % MAX_PROCESS_COUNT;
+
+    return result;
 }
 
 static void idle() {
@@ -105,10 +108,5 @@ static void idle() {
 }
 
 static Boolean isEmpty() {
-    for (int i = 0; i < MAX_PROCESS_COUNT; i++) {
-        if (processManager.RunnableProcesses[i] != NULL) {
-            return FALSE;
-        }
-    }
-    return TRUE;
+    return processManager.Front == processManager.Rear;
 }

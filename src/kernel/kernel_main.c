@@ -5,9 +5,25 @@
 #include "int/mod.h"
 #include "process/mod.h"
 
-void testProcess() {
-    Printf("Hello, World! This is a test process\n");
-    while (1);
+void A() {
+    while (TRUE) {
+        Printf("This is A process!\n");
+        Schedule();
+    }
+}
+
+void B() {
+    while (TRUE) {
+        Printf("This is B process!\n");
+        Schedule();
+    }
+}
+
+void C() {
+    while (TRUE) {
+        Printf("This is C process!\n");
+        Schedule();
+    }
 }
 
 void KernelMain() {
@@ -25,6 +41,8 @@ void KernelMain() {
 
     // 初始化进程管理
     InitializeProcessManager();
-    CreateKernelProcess(testProcess);
+    CreateKernelProcess(A);
+    CreateKernelProcess(B);
+    CreateKernelProcess(C);
     Schedule();
 }

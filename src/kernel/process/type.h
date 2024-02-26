@@ -30,6 +30,8 @@ typedef struct PIDAllocator {
 typedef struct ProcessManager {
     PCB* Current;
     PCB* RunnableProcesses[MAX_PROCESS_COUNT];
+    u32 Front;
+    u32 Rear;
 } ProcessManager;
 
 // Process Need
