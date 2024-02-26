@@ -71,6 +71,10 @@ void Schedule() {
     }
 
     PCB* next = fetchProcess();
+    // 下一个进程为用户进程时，需要设置TSS的ESP0为内核栈栈顶，ceil(按页对齐)
+    if (next->Type == PROCESS_TYPE_USER) {
+        SetTSSEsp0(((u32)next->KernelStackPointer + PageSize - 1) / PageSize * PageSize);
+    }
     next->Status = PROCESS_STATE_RUNNING;
 
     processManager.Current = next;
@@ -81,6 +85,10 @@ void Schedule() {
 
 static void runFirstProcess() {
     PCB* next = fetchProcess();
+    // 下一个进程为用户进程时，需要设置TSS的ESP0为内核栈栈顶，ceil(按页对齐)
+    if (next->Type == PROCESS_TYPE_USER) {
+        SetTSSEsp0(((u32)next->KernelStackPointer + PageSize - 1) / PageSize * PageSize);
+    }
     next->Status = PROCESS_STATE_RUNNING;
 
     PCB unused;

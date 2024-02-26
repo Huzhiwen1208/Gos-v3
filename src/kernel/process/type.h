@@ -46,3 +46,25 @@ typedef struct SwitchContext {
     u32 EBP;
     u32 EIP;
 } SwitchContext;
+
+typedef struct InterruptContext {
+    u32 Vector;  // 中断向量号
+    u32 EDI;
+    u32 ESI;
+    u32 EBP;
+    u32 ESP;
+    u32 EBX;
+    u32 EDX;
+    u32 ECX;
+    u32 EAX;
+    u32 GS;
+    u32 FS;
+    u32 ES;
+    u32 DS;
+    u32 ErrCode; // 错误码，默认0x88888888
+    u32 EIP;  // 程序计数器
+    u32 CS;
+    u32 PSW; // 程序状态字 EFlags
+    u32 ESP3; // 用户态栈
+    u32 SS3;  // 用户态栈段选择子
+} InterruptContext;
