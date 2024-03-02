@@ -11,3 +11,7 @@ static u32 SystemCall(u32 syscallNum, u32 arg1, u32 arg2, u32 arg3) {
 void SyscallTest() {
     SystemCall(SYSCALL_TEST, 1, 2, 3);
 }
+
+void SyscallPrint(String message, Size len) {
+    SystemCall(SYSCALL_WRITE, message, len, 0);
+}

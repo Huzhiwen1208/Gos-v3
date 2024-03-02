@@ -8,6 +8,8 @@ Size Println(const char *fmt, ...);
 Size PrintWithColor(ConsoleColor color, const char *fmt, ...);
 void Panic(const char *fmt, ...);
 
+Size Vsprintf(char *buf, const char *fmt, va_list args);
+
 // Assertion
 void AssertFailed(char *exp, char *file, char *base, i32 line);
 #define Assert(exp) \
@@ -25,3 +27,8 @@ void ErrorHandle(const char *file, i32 line, const char *fmt, ...);
 #define Info(fmt, ...) InfoHandle(__FILE__, __LINE__, fmt, ##__VA_ARGS__)
 #define Warn(fmt, ...) WarnHandle(__FILE__, __LINE__, fmt, ##__VA_ARGS__)
 #define Error(fmt, ...) ErrorHandle(__FILE__, __LINE__, fmt, ##__VA_ARGS__)
+
+// syscall 
+
+void SyscallTest();
+void SyscallPrint(String message, Size len);
