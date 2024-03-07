@@ -3,6 +3,9 @@
 #include "console/mod.h"
 #include "memory/mod.h"
 #include "int/mod.h"
+#include "process/mod.h"
+
+extern void user_process();
 
 void KernelMain() {
     // 清空屏幕，初始化控制台
@@ -17,5 +20,12 @@ void KernelMain() {
     // 初始化中断异常处理
     InitializeInterrupt();
 
-    SyscallTest();
+    // 初始化进程管理
+    InitializeProcessManager();
+
+    // 初始化全局描述符，TSS
+    InitializeGDT();
+
+    CreateUserProcess(user_process);
+    Schedule();
 }

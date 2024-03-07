@@ -20,6 +20,8 @@ typedef unsigned int Size;
 typedef unsigned int PhysicalAddress;
 typedef unsigned int PhysicalPageNumber;
 
+typedef unsigned int PID;
+
 // 可变参数列表
 typedef char* va_list;
 

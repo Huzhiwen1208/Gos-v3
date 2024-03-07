@@ -9,14 +9,17 @@ LdFlags=-m elf_i386 -static
 TARGET=target
 BootLoader=src/bootloader
 KernelPath=src/kernel
+UserPath=src/user
 
 ELFKernel=$(TARGET)/kernel/os.elf
 NakedKernel=$(TARGET)/kernel/os.bin
 KernelSourceFile=$(wildcard $(KernelPath)/*.c) $(wildcard $(KernelPath)/*.asm)
 KernelSourceFile+=$(wildcard $(KernelPath)/*/*.c) $(wildcard $(KernelPath)/*/*.asm)
+UserSourceFile=$(wildcard $(UserPath)/*.c)
 
 KernelOBJ=$(patsubst $(KernelPath)/%.asm, $(TARGET)/kernel/%.o, $(filter %.asm, $(KernelSourceFile)))
 KernelOBJ+=$(patsubst $(KernelPath)/%.c, $(TARGET)/kernel/%.o, $(filter %.c, $(KernelSourceFile)))
+UserOBJ=$(patsubst $(UserPath)/%.c, $(TARGET)/user/%.o, $(filter %.c, $(UserSourceFile)))
 ENTRYPOINT=0x7e00
 
 run: build
@@ -36,6 +39,9 @@ ifeq ($(wildcard $(TARGET)),)
 	@mkdir -p $(TARGET)/kernel/memory
 	@mkdir -p $(TARGET)/kernel/int
 	@mkdir -p $(TARGET)/kernel/ds
+	@mkdir -p $(TARGET)/kernel/process
+	@mkdir -p $(TARGET)/kernel/gdt
+	@mkdir -p $(TARGET)/user
 endif
 
 # .c, .asm ---> .o ------
@@ -44,7 +50,7 @@ $(TARGET)/kernel/%.o: $(KernelPath)/%.c
 $(TARGET)/user/%.o: $(UserPath)/%.c
 	$(CCompile) $(GccFlags) -c -o $@ $<
 $(TARGET)/kernel/%.o: $(KernelPath)/%.asm
-	$(AsmCompile) -f elf32 -g $< -o $@ 
+	$(AsmCompile) -f elf32 -g $< -o $@
 # ----- .c, .asm ---> .o
 
 # bootloader  -------

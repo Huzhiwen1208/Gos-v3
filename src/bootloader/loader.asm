@@ -232,6 +232,7 @@ entry_protect_mode_message:
 code_segment_selector equ 0b0000000000001000
 data_segment_selector equ 0b0000000000010000
 
+
 ; struct pointer{
 ;   limit: 16   byte size of gdt - 1
 ;   base: 32    gdt base address

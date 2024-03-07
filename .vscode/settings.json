@@ -3,6 +3,7 @@
         "typeinfo": "cpp",
         "mod.h": "c",
         "method.h": "c",
-        "type.h": "c"
+        "type.h": "c",
+        "stdlib.h": "c"
     }
 }
