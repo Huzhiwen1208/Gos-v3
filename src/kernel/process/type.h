@@ -18,6 +18,7 @@ typedef struct PCB {
     PID ID;
     ProcessState Status;
     ProcessType Type;
+    u32 RootPPN;
 } PCB;
 
 // PID allocator

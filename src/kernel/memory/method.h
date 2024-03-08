@@ -23,3 +23,9 @@ void Free(PhysicalAddress address);
 // Stable
 PhysicalAddress StableMalloc(Size size);
 void StableFree(PhysicalAddress address);
+
+// Memory Mapping
+void SetRootPageTableAddr(PhysicalAddress addr);
+PhysicalAddress GetRootPageTableAddr();
+void FlushTLB(VirtualAddress addr);
+void InitializeMemoryMapping();

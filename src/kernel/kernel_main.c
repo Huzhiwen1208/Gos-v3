@@ -7,6 +7,25 @@
 
 extern void user_process();
 
+void A() {
+    while (TRUE) {
+        PrintWithColor(GREEN, "This is A process\n");
+        Schedule();
+    }
+}
+void B() {
+    while (TRUE) {
+        PrintWithColor(YELLOW, "This is B process\n");
+        Schedule();
+    }
+}
+void C() {
+    while (TRUE) {
+        PrintWithColor(BLUE, "This is C process\n");
+        Schedule();
+    }
+}
+
 void KernelMain() {
     // 清空屏幕，初始化控制台
     InitializeConsole();
@@ -26,6 +45,11 @@ void KernelMain() {
     // 初始化全局描述符，TSS
     InitializeGDT();
 
-    CreateUserProcess(user_process);
+    // 初始化虚拟分页
+    InitializeMemoryMapping();
+
+    CreateKernelProcess(A);
+    CreateKernelProcess(B);
+    CreateKernelProcess(C);
     Schedule();
 }

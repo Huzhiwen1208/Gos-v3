@@ -12,6 +12,14 @@ void CreateKernelProcess(void* entry) {
     process->Status = PROCESS_STATE_RUNNABLE;
     u32 stack = AllocateOnePage(KernelMode) + PageSize;
     process->Type = PROCESS_TYPE_KERNEL;
+    // 复制内核态常驻页表内容，前4MB的等值映射
+    u32 kernelProcessRootPPN = GetPPNFromAddressFloor(AllocateOnePage(KernelMode));
+    process->RootPPN = kernelProcessRootPPN;
+    MemoryCopy(
+        GetAddressFromPPN(kernelProcessRootPPN),
+        GetRootPageTableAddr(),
+        PageSize
+    );
 
     stack -= sizeof(SwitchContext);
     SwitchContext* context = (SwitchContext*)stack;
