@@ -70,4 +70,4 @@ typedef struct InterruptContext {
     u32 SS3;  // 用户态栈段选择子
 } InterruptContext;
 
-#define UserStackTop 0x10000000
+#define UserStackTop 0x10000000 // 256MB
