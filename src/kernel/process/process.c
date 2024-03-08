@@ -75,6 +75,10 @@ void Schedule() {
     if (next->Type == PROCESS_TYPE_USER) {
         SetTSSEsp0(((u32)next->KernelStackPointer + PageSize - 1) / PageSize * PageSize);
     }
+    // 下一个进程的页表和当前进程的页表不同，需要切换页表
+    if (next->RootPPN != processManager.Current->RootPPN) {
+        SetRootPageTableAddr(GetAddressFromPPN(next->RootPPN));
+    }
     next->Status = PROCESS_STATE_RUNNING;
 
     processManager.Current = next;
@@ -89,6 +93,8 @@ static void runFirstProcess() {
     if (next->Type == PROCESS_TYPE_USER) {
         SetTSSEsp0(((u32)next->KernelStackPointer + PageSize - 1) / PageSize * PageSize);
     }
+    // 下一个进程的页表需要上CPU，CR3寄存器
+    SetRootPageTableAddr(GetAddressFromPPN(next->RootPPN));
     next->Status = PROCESS_STATE_RUNNING;
 
     PCB unused;

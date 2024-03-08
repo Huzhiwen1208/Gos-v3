@@ -18,6 +18,7 @@ typedef struct PCB {
     PID ID;
     ProcessState Status;
     ProcessType Type;
+    u32 RootPPN;
 } PCB;
 
 // PID allocator
@@ -68,3 +69,5 @@ typedef struct InterruptContext {
     u32 ESP3; // 用户态栈
     u32 SS3;  // 用户态栈段选择子
 } InterruptContext;
+
+#define UserStackTop 0x10000000

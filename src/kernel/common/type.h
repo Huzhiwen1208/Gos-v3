@@ -18,6 +18,7 @@ typedef char* String;
 typedef unsigned int Size;
 
 typedef unsigned int PhysicalAddress;
+typedef unsigned int VirtualAddress;
 typedef unsigned int PhysicalPageNumber;
 
 typedef unsigned int PID;
