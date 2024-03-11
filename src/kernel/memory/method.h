@@ -29,3 +29,6 @@ void SetRootPageTableAddr(PhysicalAddress addr);
 PhysicalAddress GetRootPageTableAddr();
 void FlushTLB(VirtualAddress addr);
 void InitializeMemoryMapping();
+
+void EnablePaging();
+void DisablePaging();

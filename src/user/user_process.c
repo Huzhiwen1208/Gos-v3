@@ -1,10 +1,20 @@
 #include "stdlib.h"
 
 void user_process() {
-    while(1) {
-        int a = 32;
-        a = 2 + 3;
-        a = 12 + 5;
-        SyscallTest();
+    int pid = Fork();
+    if (pid == 0) {
+        // 子进程
+        while (1) {
+            int a = 3;
+            a += 2;
+            Yield();
+        }
+    }else {
+        // 父进程
+        while (1) {
+            int b = 3;
+            b += 3;
+            Yield();
+        }
     }
 }

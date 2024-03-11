@@ -9,3 +9,5 @@ void Schedule();
 
 void CreateKernelProcess(void* entry);
 void CreateUserProcess(void* entry);
+
+PID ForkProcess();
