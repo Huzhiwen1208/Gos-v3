@@ -11,6 +11,8 @@ static u32 KernelRootPPN;
 static void initPageTableEntry(PageTableEntry* pte, u32 nextPPN, Boolean user);
 static void enablePaging();
 static void disablePaging();
+static PageTableEntry* findPTE(VirtualAddress addr);
+static PageTableEntry* findPTECreate(VirtualAddress addr);
 
 // public methods
 
@@ -51,6 +53,14 @@ void InitializeMemoryMapping() {
     enablePaging();
 }
 
+void MapPage(VirtualAddress addr) {
+    disablePaging();  // 分页MMU一旦开启，就不能被修改，关了之后就能修改
+    // 映射，修改页表MMU
+    findPTECreate(addr);
+    enablePaging();
+    FlushTLB(addr);
+}
+
 // static methods implementation
 
 static void initPageTableEntry(PageTableEntry* pte, u32 nextPPN, Boolean user) {
@@ -77,4 +87,34 @@ static void disablePaging() {
     asm volatile ("movl %cr0, %eax");
     asm volatile ("andl $0x7FFFFFFF, %eax");
     asm volatile ("movl %eax, %cr0");
+}
+
+static PageTableEntry* findPTE(VirtualAddress addr) {
+    PageTableEntry* rootPTE = (PageTableEntry*)GetRootPageTableAddr();
+    u32 firstIndex = addr >> 22;
+    u32 secondIndex = (addr >> 12) & 0x3ff;
+
+    PageTableEntry* pte = rootPTE + firstIndex;
+    if (pte->Present == 0) return NULL;
+    return (PageTableEntry*)GetAddressFromPPN(pte->NextPPN) + secondIndex;
+}
+
+static PageTableEntry* findPTECreate(VirtualAddress addr) {
+    PageTableEntry* rootPTE = (PageTableEntry*)GetRootPageTableAddr();
+    u32 firstIndex = addr >> 22;
+    u32 secondIndex = (addr >> 12) & 0x3ff;
+
+    PageTableEntry* pte = rootPTE + firstIndex;
+    if (pte->Present == 0) {
+        PhysicalAddress secondPageTable = AllocateOnePage(UserMode);
+        initPageTableEntry(pte, GetPPNFromAddressFloor(secondPageTable), TRUE);
+    }
+
+    pte = (PageTableEntry*)GetAddressFromPPN(pte->NextPPN) + secondIndex;
+    if (pte->Present == 0) {
+        PhysicalAddress page = AllocateOnePage(UserMode);
+        initPageTableEntry(pte, GetPPNFromAddressFloor(page), TRUE);
+    }
+
+    return pte;
 }
