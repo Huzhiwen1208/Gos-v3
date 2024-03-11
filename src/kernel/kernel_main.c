@@ -20,7 +20,9 @@ void KernelMain() {
     InitializeGDT();
     // 初始化虚拟分页
     InitializeMemoryMapping();
-
+    // 初始化异常处理
+    InitializePageFaultHandler();
+    
     // TestKernelProcessWithPaging();
     TestUserProcessWithPageing();
 }
