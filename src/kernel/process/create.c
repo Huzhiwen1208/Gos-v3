@@ -5,7 +5,7 @@ extern void RestoreContext();
 /// @brief 让栈指针指向Interrupt Context方便返回用户态
 static void restore();
 static void copyPageTableRecursion(u32 childRootPPN, u32 parentRootPPN);
-
+static void freePageTableRecursion(u32 rootPPN);
 
 void CreateKernelProcess(void* entry) {
     PCB* process = (PCB*)Malloc(sizeof(PCB));
@@ -115,6 +115,41 @@ PID ForkProcess() {
     AddProcess(child);
     Schedule();
     return child->ID;
+}
+
+void ExitProcess(i32 exitCode) {
+    PCB* current = GetCurrentProcess();
+    current->Status = PROCESS_STATE_ZOMBIE;
+    current->ExitCode = exitCode;  // 退出码
+    FreePID(current->ID); // 释放PID
+    freePageTableRecursion(current->RootPPN); // 递归释放页表
+    // 释放内核栈
+    FreeOnePage(GetAddressFromPPN(GetPPNFromAddressFloor(current->KernelStackPointer)));
+
+    // 将所有的子进程挂到当前进程的父进程下
+    RedirectParentOfChildren();
+
+    Schedule();
+}
+
+static void freePageTableRecursion(u32 rootPPN) {
+    DisablePaging();
+    PageTableEntry* rootPTE = (PageTableEntry*)GetAddressFromPPN(rootPPN);
+    for (Size i = 1; i < 1024; i++) {
+        if (rootPTE[i].Present == 0) continue; // 不存在的页表项不释放
+
+        u32 secondPPN = rootPTE[i].NextPPN;
+        PageTableEntry* secondPTE = (PageTableEntry*)GetAddressFromPPN(secondPPN);
+        for (Size j = 0; j < 1024; j++) {
+            if (secondPTE[j].Present == 0) continue; // 不存在的页帧不释放
+
+            u32 thirdPPN = secondPTE[j].NextPPN;
+            FreeOnePage(GetAddressFromPPN(thirdPPN));
+        }
+        FreeOnePage(GetAddressFromPPN(secondPPN));
+    }
+    FreeOnePage(GetAddressFromPPN(rootPPN));
+    EnablePaging();
 }
 
 static void restore() {

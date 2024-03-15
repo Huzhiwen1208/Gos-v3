@@ -20,6 +20,10 @@ u32 Fork() {
     return SystemCall(SYSCALL_FORK, 0, 0, 0);
 }
 
+u32 GetTime() {
+    return SystemCall(SYSCALL_GET_TIME, 0, 0, 0);
+}
+
 void Yield() {
     SystemCall(SYSCALL_YIELD, 0, 0, 0);
 }
@@ -30,4 +34,8 @@ Size Read(String buf, Size len) {
 
 PID GetPID() {
     return SystemCall(SYSCALL_GET_PID, 0, 0, 0);
+}
+
+void Exit(i32 exitCode) {
+    SystemCall(SYSCALL_EXIT, (u32)exitCode, 0, 0);
 }

@@ -11,3 +11,6 @@ void CreateKernelProcess(void* entry);
 void CreateUserProcess(void* entry);
 
 PID ForkProcess();
+
+void RedirectParentOfChildren();
+void ExitProcess(i32 exitCode);
