@@ -31,6 +31,7 @@ typedef struct DescriptorTablePointer DescriptorTablePointer;
 #define SYSCALL_FORK 88
 #define SYSCALL_YIELD 99
 #define SYSCALL_GET_PID 111
+#define SYSCALL_GET_PPID 222
 #define SYSCALL_EXIT 444
 #define SYSCALL_WAIT_PID 555
 #define SYSCALL_GET_TIME 888

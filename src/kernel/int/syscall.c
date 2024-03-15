@@ -36,6 +36,10 @@ static PID syscallWaitPid(PID pid, i32* exitCode) {
     return WaitProcess(pid, exitCode);
 }
 
+static PID syscallGetPPID() {
+    return GetCurrentProcess()->ParentID;
+}
+
 u32 TrapHandler(u32 syscallNum, u32 arg1, u32 arg2, u32 arg3) {
     switch (syscallNum) {
         case SYSCALL_TEST:
@@ -60,6 +64,8 @@ u32 TrapHandler(u32 syscallNum, u32 arg1, u32 arg2, u32 arg3) {
             break;
         case SYSCALL_WAIT_PID:
             return syscallWaitPid(arg1, arg2);
+        case SYSCALL_GET_PPID:
+            return syscallGetPPID();
         default:
             Panic("Unknown syscall number: %d", syscallNum);
     }

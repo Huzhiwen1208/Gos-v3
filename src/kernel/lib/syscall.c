@@ -52,3 +52,7 @@ PID WaitPid(PID pid, i32* exitCode) {
         }
     }
 }
+
+PID GetPPID() {
+    SystemCall(SYSCALL_GET_PPID, 0, 0, 0);
+}

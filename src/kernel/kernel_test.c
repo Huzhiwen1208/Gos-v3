@@ -20,6 +20,7 @@ extern void syscall_get_pid_test3();
 extern void syscall_exit_test1();
 extern void syscall_exit_test2();
 extern void syscall_wait_pid_test();
+extern void syscall_get_ppid_test();
 
 // 测试方法列表
 void TestKernelProcessWithPaging();  // 分页开启后的内核级进程调度测试
@@ -30,6 +31,7 @@ void TestSyscallRead();             // 系统调用Read测试
 void TestSyscallGetPid();           // 系统调用GetPid测试
 void TestSyscallExit();             // 系统调用Exit测试
 void TestSyscallWaitPid();             // 系统调用WaitPid测试
+void TestSyscallGetPPID();             // 系统调用GetPPID测试
 
 // 测试套件，主测试方法
 void KernelMainTest() {
@@ -40,7 +42,8 @@ void KernelMainTest() {
     // TestSyscallRead();
     // TestSyscallGetPid();
     // TestSyscallExit();
-    TestSyscallWaitPid();
+    // TestSyscallWaitPid();
+    TestSyscallGetPPID();
 }
 
 
@@ -86,6 +89,10 @@ void TestSyscallExit() {
 
 void TestSyscallWaitPid() {
     CreateUserProcess(syscall_wait_pid_test);
+}
+
+void TestSyscallGetPPID() {
+    CreateUserProcess(syscall_get_ppid_test);
 }
 
 void ProcessA() {

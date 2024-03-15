@@ -11,3 +11,4 @@ PID GetPID();
 u32 GetTime();
 void Exit(i32 exitCode);
 PID WaitPid(PID pid, i32* exitCode);
+PID GetPPID();
