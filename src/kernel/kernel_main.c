@@ -22,7 +22,8 @@ void KernelMain() {
     InitializeMemoryMapping();
     // 初始化异常处理
     InitializePageFaultHandler();
-    
-    // TestKernelProcessWithPaging();
-    TestUserProcessWithPageing();
+    // 初始化时钟中断
+    InitializeClock();
+
+    TestClockInterrupt();
 }

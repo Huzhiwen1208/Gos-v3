@@ -36,3 +36,9 @@ void TestUserProcessWithPageing() {
     CreateUserProcess(user_process);
     Schedule();
 }
+
+void TestClockInterrupt() {
+    CreateKernelProcess(A);
+    CreateKernelProcess(B);
+    CreateKernelProcess(C);
+}
