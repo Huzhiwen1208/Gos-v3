@@ -17,7 +17,7 @@ void SyscallPrint(String message, Size len) {
 }
 
 u32 Fork() {
-    SystemCall(SYSCALL_FORK, 0, 0, 0);
+    return SystemCall(SYSCALL_FORK, 0, 0, 0);
 }
 
 void Yield() {
@@ -25,5 +25,9 @@ void Yield() {
 }
 
 Size Read(String buf, Size len) {
-    SystemCall(SYSCALL_READ, (u32)buf, (u32)len, 0);
+    return SystemCall(SYSCALL_READ, (u32)buf, (u32)len, 0);
+}
+
+PID GetPID() {
+    return SystemCall(SYSCALL_GET_PID, 0, 0, 0);
 }

@@ -20,6 +20,10 @@ static Size syscallRead(String buf, Size len) {
     return ReadLine(buf, len);
 }
 
+static PID syscallGetPid() {
+    return GetCurrentProcess()->ID;
+}
+
 u32 TrapHandler(u32 syscallNum, u32 arg1, u32 arg2, u32 arg3) {
     switch (syscallNum) {
         case SYSCALL_TEST:
@@ -35,6 +39,8 @@ u32 TrapHandler(u32 syscallNum, u32 arg1, u32 arg2, u32 arg3) {
             break;
         case SYSCALL_READ:
             return syscallRead(arg1, arg2);
+        case SYSCALL_GET_PID:
+            return syscallGetPid();
         default:
             Panic("Unknown syscall number: %d", syscallNum);
     }

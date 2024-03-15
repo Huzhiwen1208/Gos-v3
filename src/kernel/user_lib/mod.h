@@ -7,3 +7,4 @@ void SyscallPrint(String message, Size len);
 u32 Fork();
 void Yield();
 Size Read(String buf, Size len);
+PID GetPID();

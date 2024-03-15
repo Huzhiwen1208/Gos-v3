@@ -30,6 +30,7 @@ typedef struct DescriptorTablePointer DescriptorTablePointer;
 #define SYSCALL_WRITE 1
 #define SYSCALL_FORK 88
 #define SYSCALL_YIELD 99
+#define SYSCALL_GET_PID 111
 #define SYSCALL_READ 999
 
 // 时钟中断
