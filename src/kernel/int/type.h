@@ -27,8 +27,10 @@ typedef struct DescriptorTablePointer DescriptorTablePointer;
 
 // 系统调用号
 #define SYSCALL_TEST 0
+#define SYSCALL_WRITE 1
 #define SYSCALL_FORK 88
 #define SYSCALL_YIELD 99
+#define SYSCALL_READ 999
 
 // 时钟中断
 #define ClockCounter0 0x40  // 计数器0
@@ -40,3 +42,6 @@ typedef struct DescriptorTablePointer DescriptorTablePointer;
 #define ClockMaxCounter 11931 // 时钟倒计时初值
 #define JeffyMS 10 // 时间片毫秒数，每10ms进行一次进程切换
 #define MSPerTick (1.0 / OsclilatorFrequency) // 每一次时钟打点占用的秒数
+
+// 键盘中断
+#define KeyboardDataPort 0x60 // 键盘数据寄存器端口

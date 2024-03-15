@@ -24,6 +24,8 @@ void KernelMain() {
     InitializePageFaultHandler();
     // 初始化时钟中断
     InitializeClock();
+    // 初始化键盘中断
+    InitializeKeyboard();
 
-    TestClockInterrupt();
+    KernelMainTest();
 }

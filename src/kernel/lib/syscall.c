@@ -12,10 +12,18 @@ void SyscallTest() {
     SystemCall(SYSCALL_TEST, 1, 2, 3);
 }
 
+void SyscallPrint(String message, Size len) {
+    SystemCall(SYSCALL_WRITE, (u32)message, (u32)len, 0);
+}
+
 u32 Fork() {
     SystemCall(SYSCALL_FORK, 0, 0, 0);
 }
 
 void Yield() {
     SystemCall(SYSCALL_YIELD, 0, 0, 0);
+}
+
+Size Read(String buf, Size len) {
+    SystemCall(SYSCALL_READ, (u32)buf, (u32)len, 0);
 }

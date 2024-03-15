@@ -11,5 +11,10 @@ void RestoreInterruptStatus(u8 status);
 
 void InitializePageFaultHandler();
 
+// 时钟
 void InitializeClock();
 u32 GetTimeMS();
+
+// 键盘
+void InitializeKeyboard();
+Size ReadLine(char* buf, Size len);
