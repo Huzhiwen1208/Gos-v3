@@ -118,6 +118,31 @@ void RedirectParentOfChildren() {
     }
 }
 
+PCB* FindActivatedChildProcessByPID(PID pid) {
+    PCB* current = processManager.Current;
+    for (i32 i = processManager.Front; i < processManager.Rear; i = (i + 1) % MAX_PROCESS_COUNT) {
+        PCB* process = (PCB*)processManager.RunnableProcesses[i];
+        if (process && process->ParentID == current->ID && (process->ID == pid || pid == -1)) {
+            return process;
+        }
+    }
+    return NULL;
+}
+
+PCB* TakeZombieProcess(PID pid) {
+    PCB* current = processManager.Current;
+    for (i32 i = 0; i < MAX_PROCESS_COUNT; i++) {
+        PCB* process = (PCB*)processManager.ZombieProcesses[i];
+        if (process && process->ParentID == current->ID && (process->ID == pid || pid == -1)) {
+            processManager.ZombieProcesses[i] = NULL;
+            return process;
+        }
+    }
+
+    return NULL;
+}
+
+
 // static methods implement
 
 static void runFirstProcess() {

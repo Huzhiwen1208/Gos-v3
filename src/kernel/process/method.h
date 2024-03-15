@@ -13,4 +13,7 @@ void CreateUserProcess(void* entry);
 PID ForkProcess();
 
 void RedirectParentOfChildren();
+PCB* FindActivatedChildProcessByPID(PID pid);
+PCB* TakeZombieProcess(PID pid);
 void ExitProcess(i32 exitCode);
+PID WaitProcess(PID pid, i32* exitCode);

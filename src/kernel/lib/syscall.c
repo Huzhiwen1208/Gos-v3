@@ -39,3 +39,16 @@ PID GetPID() {
 void Exit(i32 exitCode) {
     SystemCall(SYSCALL_EXIT, (u32)exitCode, 0, 0);
 }
+
+PID WaitPid(PID pid, i32* exitCode) {
+    while (TRUE) {
+        PID rid = SystemCall(SYSCALL_WAIT_PID, (u32)pid, (u32)exitCode, 0);
+        switch (rid) {
+            case -2:
+                Yield();
+                break;
+            default:
+                return rid;
+        }
+    }
+}

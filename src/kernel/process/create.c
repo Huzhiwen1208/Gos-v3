@@ -132,6 +132,33 @@ void ExitProcess(i32 exitCode) {
     Schedule();
 }
 
+/*
+    1. 如果遍历完所有Runnable进程和Zombie进程都没有找到，说明进程不存在，返回-1
+    2. 如果在Runnable进程中找到，说明进程还没退出，返回-2
+    3. 如果在Zombie进程中找到，说明进程已经退出，返回退出码并回收进程的PCB
+*/
+PID WaitProcess(PID pid, i32* exitCode) {
+    PCB* current = GetCurrentProcess();
+    
+    PCB* activatedChild = FindActivatedChildProcessByPID(pid);
+    PCB* zombieChild = TakeZombieProcess(pid);
+
+    if (activatedChild == NULL && zombieChild == NULL) {
+        return -1;
+    }
+
+    if (zombieChild == NULL) {
+        return -2;
+    }
+
+    // 存在僵尸子进程
+    *exitCode = zombieChild->ExitCode;
+
+    PID rid = zombieChild->ID;
+    Free(zombieChild); // 释放PCB
+    return rid;
+}
+
 static void freePageTableRecursion(u32 rootPPN) {
     DisablePaging();
     PageTableEntry* rootPTE = (PageTableEntry*)GetAddressFromPPN(rootPPN);
