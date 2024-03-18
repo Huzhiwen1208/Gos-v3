@@ -4,6 +4,8 @@
 #include "memory/mod.h"
 #include "int/mod.h"
 #include "process/mod.h"
+#include "device/mod.h"
+#include "disk/mod.h"
 
 void KernelMain() {
     // 清空屏幕，初始化控制台
@@ -24,6 +26,10 @@ void KernelMain() {
     InitializeClock();
     // 初始化键盘中断
     InitializeKeyboard();
+    // 初始化设备表
+    InitializeDevice();
+    // 初始化磁盘
+    InitializeIdeDisk();
 
     KernelMainTest();
 }

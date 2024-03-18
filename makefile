@@ -41,6 +41,9 @@ ifeq ($(wildcard $(TARGET)),)
 	@mkdir -p $(TARGET)/kernel/ds
 	@mkdir -p $(TARGET)/kernel/process
 	@mkdir -p $(TARGET)/kernel/gdt
+	@mkdir -p $(TARGET)/kernel/disk
+	@mkdir -p $(TARGET)/kernel/device
+	@mkdir -p $(TARGET)/kernel/ds
 	@mkdir -p $(TARGET)/user
 endif
 

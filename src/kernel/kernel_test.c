@@ -4,6 +4,8 @@
 #include "memory/mod.h"
 #include "int/mod.h"
 #include "process/mod.h"
+#include "disk/mod.h"
+#include "device/mod.h"
 
 // 进程列表
 void ProcessA();
@@ -29,7 +31,9 @@ void TestSyscallGetTime();          // 系统调用Read测试
 void TestSyscallRead();             // 系统调用Read测试
 void TestSyscallGetPid();           // 系统调用GetPid测试
 void TestSyscallExit();             // 系统调用Exit测试
-void TestSyscallWaitPid();             // 系统调用WaitPid测试
+void TestSyscallWaitPid();          // 系统调用WaitPid测试
+
+void TestReadWriteDisk();           // 读写磁盘测试
 
 // 测试套件，主测试方法
 void KernelMainTest() {
@@ -40,7 +44,8 @@ void KernelMainTest() {
     // TestSyscallRead();
     // TestSyscallGetPid();
     // TestSyscallExit();
-    TestSyscallWaitPid();
+    // TestSyscallWaitPid();
+    TestReadWriteDisk();
 }
 
 
@@ -86,6 +91,26 @@ void TestSyscallExit() {
 
 void TestSyscallWaitPid() {
     CreateUserProcess(syscall_wait_pid_test);
+}
+
+void TestReadWriteDisk() {
+    // 读写磁盘测试
+    char* buffer = (char*)Malloc(512);
+    int i;
+    for (i = 0; i < 512; i++) {
+        buffer[i] = 8;
+    }
+    DeviceWrite(0, 0, 1, buffer);
+    DeviceRead(0, 0, 1, buffer);
+    for (i = 0; i < 512; i++) {
+        if (buffer[i] != 8) {
+            PrintWithColor(RED, "Read/Write Disk Error!\n");
+            break;
+        }
+    }
+    if (i == 512) {
+        PrintWithColor(GREEN, "Read/Write Disk Success!\n");
+    }
 }
 
 void ProcessA() {

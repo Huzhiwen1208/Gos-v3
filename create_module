@@ -1,0 +1,22 @@
+#!/bin/bash
+
+file_name=$1
+cd src/kernel
+mkdir $file_name
+cd $file_name
+
+touch type.h
+touch method.h
+touch mod.h
+cat > type.h  << EOF
+#pragma once
+#include "../common/type.h"
+EOF
+cat > method.h  << EOF
+#pragma once
+EOF
+cat > mod.h  << EOF
+#pragma once
+#include "type.h"
+#include "method.h"
+EOF
