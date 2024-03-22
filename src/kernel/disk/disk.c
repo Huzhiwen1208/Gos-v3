@@ -79,6 +79,8 @@ void InitializeIdeDisk() {
             InstallDevice(device); // 安装磁盘到设备表
         }
     }
+
+    InitializeDiskCache();
 }
 
 // static methods implementation

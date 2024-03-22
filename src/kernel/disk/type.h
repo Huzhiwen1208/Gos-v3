@@ -5,6 +5,7 @@
 
 #define DISK_COUNT_PER_CONTROLLER 2
 #define IDE_CONTROLLER_COUNT 2
+#define NAME_LENGTH 32
 
 #define IdeIobaseMaster 0x1F0  // IDE主控制器的IO基址
 #define IdeIobaseSlave 0x170  // IDE从控制器的IO基址

@@ -6,6 +6,8 @@
 #include "process/mod.h"
 #include "device/mod.h"
 #include "disk/mod.h"
+#include "fs/mod.h"
+#include "ds/mod.h"
 
 void KernelMain() {
     // 清空屏幕，初始化控制台
@@ -30,6 +32,8 @@ void KernelMain() {
     InitializeDevice();
     // 初始化磁盘
     InitializeIdeDisk();
+    // 初始化文件系统
+    InitializeFileSystem();
 
     KernelMainTest();
 }
