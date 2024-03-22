@@ -61,7 +61,7 @@ void DeviceIoctl(u32 deviceID, u32 cmd, void *arg) {
     device->Ioctl(device->DevicePtr, cmd, arg);
 }
 
-i32 DeviceRead(u32 deviceID, u64 offset, u32 size, void *buffer) {
+i32 DeviceRead(DeviceID deviceID, u64 offset, u32 size, void *buffer) {
     Device *device = GetDeviceByID(deviceID);
     if (device == NULL) {
         return -1;

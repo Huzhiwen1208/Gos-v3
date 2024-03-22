@@ -96,3 +96,8 @@ struct IdeParam {
     u16 Integrity;
 } StructNotAlign;
 typedef struct IdeParam IdeParam;
+
+typedef enum DeviceID {
+    GOS_DEVICE,
+    FS_DEVICE
+} DeviceID;

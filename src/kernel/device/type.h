@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../common/type.h"
+#include "../disk/type.h"
 
 #define NAME_LENGTH 32
 #define DEVICE_COUNT 64
