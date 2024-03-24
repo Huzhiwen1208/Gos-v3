@@ -43,6 +43,9 @@
 #define IdeCommandIdentify 0xEC // 识别命令
 #define IdeCommandDiagnostic 0x90 // 诊断命令
 
+#define BlockCacheStart 0x3f0000
+#define BlockCacheEnd 0x400000
+
 typedef struct IdeDisk {
     char Name[NAME_LENGTH]; // 磁盘名称
     struct IdeController* Controller; // 磁盘所属IDE控制器

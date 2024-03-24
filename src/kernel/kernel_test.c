@@ -6,6 +6,7 @@
 #include "process/mod.h"
 #include "disk/mod.h"
 #include "device/mod.h"
+#include "fs/mod.h"
 
 // 进程列表
 void ProcessA();
@@ -32,8 +33,8 @@ void TestSyscallRead();             // 系统调用Read测试
 void TestSyscallGetPid();           // 系统调用GetPid测试
 void TestSyscallExit();             // 系统调用Exit测试
 void TestSyscallWaitPid();          // 系统调用WaitPid测试
-
 void TestReadWriteDisk();           // 读写磁盘测试
+void TestFileSystem();              // 测试文件系统方法
 
 // 测试套件，主测试方法
 void KernelMainTest() {
@@ -45,7 +46,8 @@ void KernelMainTest() {
     // TestSyscallGetPid();
     // TestSyscallExit();
     // TestSyscallWaitPid();
-    TestReadWriteDisk();
+    // TestReadWriteDisk();
+    TestFileSystem();
 }
 
 
@@ -111,6 +113,28 @@ void TestReadWriteDisk() {
     if (i == 512) {
         PrintWithColor(GREEN, "Read/Write Disk Success!\n");
     }
+}
+
+void TestFileSystem() {
+    CreateFile(-1, "test.txt", FT_FILE);
+    CreateFile(-1, "test2.txt", FT_FILE);
+    ListFiles("", "/");
+    WriteFileContent("/test.txt", "Hello World!\n", FALSE);
+    WriteFileContent("/test.txt", "Hello World!\n", FALSE);
+    WriteFileContent("/test.txt", "Hello World!\n", FALSE);
+    WriteFileContent("/test.txt", "Hello World!\n", FALSE);
+    PrintFileContent("test.txt", 3);
+
+    MakeDirectory("/test", "");
+    MakeDirectory("/testdir/x1", "-p");
+    MakeDirectory("/testdir/x33", "-p");
+    ChangeDirectory("/testdir/");
+    ListFiles("", ".");
+    ChangeDirectory("/");
+
+    ListFiles("", ".");
+    RemoveFile("-r", "/test");
+    ListFiles("", "/");
 }
 
 void ProcessA() {

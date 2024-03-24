@@ -42,7 +42,7 @@ typedef struct GFS {
     u32 DataAreaStartBlockID; // 数据区域开始的块号
 
     ReentrantLock* rlock; // 可重入锁
-} EasyFS;
+} GFS;
 
 typedef struct DirectoryEntry {
     u32 InodeID; // inode号

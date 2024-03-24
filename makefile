@@ -25,7 +25,8 @@ ENTRYPOINT=0x7e00
 
 run: build
 	qemu-system-i386 -m 32M \
-		-drive file=img/gos.img,if=ide,index=0,media=disk,format=raw
+		-drive file=img/gos.img,if=ide,index=0,media=disk,format=raw \
+		-drive file=img/fs.img,if=ide,index=1,media=disk,format=raw
 
 build: $(TARGET) $(IMG)
 
