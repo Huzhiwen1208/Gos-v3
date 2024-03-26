@@ -18,3 +18,4 @@ u32 GetTimeMS();
 // 键盘
 void InitializeKeyboard();
 Size ReadLine(char* buf, Size len);
+char ReadChar();

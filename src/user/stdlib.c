@@ -18,3 +18,27 @@ int strlen(const char* str) {
     }
     return len;
 }
+
+int strcmp(const char* str1, const char* str2) {
+    int i = 0;
+    while (str1[i] != '\0' && str2[i] != '\0') {
+        if (str1[i] != str2[i]) {
+            return str1[i] - str2[i];
+        }
+        i++;
+    }
+    return str1[i] - str2[i];
+}
+
+int memset(void* ptr, int value, int num) {
+    char* p = (char*)ptr;
+    for (int i = 0; i < num; i++) {
+        p[i] = value;
+    }
+    return num;
+}
+
+int strcpy(char* dst, const char* src, int size) {
+    for (int i = 0; i < size; i++)
+        dst[i] = src[i];
+}

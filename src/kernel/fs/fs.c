@@ -122,7 +122,7 @@ Boolean WriteFileContent(String path, String content, Boolean trunc) {
     }
 
     if (trunc) {
-        ClearFileContent(id);
+        ClearFileContent(path);
     }
 
     // 写入

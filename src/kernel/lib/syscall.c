@@ -32,6 +32,10 @@ Size Read(String buf, Size len) {
     return SystemCall(SYSCALL_READ, (u32)buf, (u32)len, 0);
 }
 
+char GetChar() {
+    return SystemCall(SYSCALL_READ_CHAR, 0, 0, 0);
+}
+
 PID GetPID() {
     return SystemCall(SYSCALL_GET_PID, 0, 0, 0);
 }
@@ -51,4 +55,24 @@ PID WaitPid(PID pid, i32* exitCode) {
                 return rid;
         }
     }
+}
+
+String PWD() {
+    SystemCall(SYSCALL_PWD, 0, 0, 0);
+}
+
+void ListDir(String path, String option) {
+    SystemCall(SYSCALL_LS, (u32)path, (u32)option, 0);
+}
+
+void TouchFile(String name) {
+    SystemCall(SYSCALL_CREATE_FILE, (u32)name, 0, 0);
+}
+
+void WriteToFile(String content, String filename) {
+    SystemCall(SYSCALL_WRITE_FILE, (u32)content, (u32)filename, 0);
+}
+
+void BrowserFile(String filename) {
+    SystemCall(SYSCALL_CAT_FILE, (u32)filename, 0, 0);
 }

@@ -118,7 +118,7 @@ void TestReadWriteDisk() {
 void TestFileSystem() {
     CreateFile(-1, "test.txt", FT_FILE);
     CreateFile(-1, "test2.txt", FT_FILE);
-    ListFiles("", "/");
+    ListFiles("", ".");
     WriteFileContent("/test.txt", "Hello World!\n", FALSE);
     WriteFileContent("/test.txt", "Hello World!\n", FALSE);
     WriteFileContent("/test.txt", "Hello World!\n", FALSE);

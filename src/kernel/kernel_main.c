@@ -35,5 +35,6 @@ void KernelMain() {
     // 初始化文件系统
     InitializeFileSystem();
 
-    KernelMainTest();
+    // KernelMainTest();
+    GotoGshell();
 }

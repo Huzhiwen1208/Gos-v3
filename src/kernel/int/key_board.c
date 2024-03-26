@@ -210,6 +210,8 @@ static Boolean extcodeState; // 扩展码状态
 static char *globalBuffer;
 static Size globalBufferLength;
 
+static char globalChar;
+
 static void keyboardHandler(int vector) {
     Assert(vector == 0x21);
     OuteralInterruptCompleted(vector);
@@ -277,6 +279,9 @@ static void keyboardHandler(int vector) {
     if (globalBuffer) {
         globalBuffer[globalBufferLength++] = ch;
     }
+
+    // 写入globalChar
+    globalChar = ch;
 }
 
 void InitializeKeyboard() {
@@ -284,9 +289,21 @@ void InitializeKeyboard() {
     extcodeState = FALSE;
     globalBuffer = NULL;
     globalBufferLength = 0;
+    globalChar = NULL_CHAR;
 
     SetInterruptHandler(0x21, keyboardHandler);
     SetInterrupt(0x21);
+}
+
+char ReadChar() {
+    u8 status = GetInterruptStatus();
+    asm volatile("sti");
+    char result;
+    while (globalChar == NULL_CHAR);
+    result = globalChar;
+    globalChar = NULL_CHAR;
+    RestoreInterruptStatus(status);
+    return result;
 }
 
 Size ReadLine(char* buf, Size len) {
