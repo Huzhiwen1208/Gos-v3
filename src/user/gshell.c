@@ -109,6 +109,8 @@ void shell() {
            } else {
                 printf("unsupport used of cat!\n");
            }
+        } else if (strcmp(cmd, "whoami") == 0) {
+            printf("root\n");
         } else {
             printf("Unknown command: %s\n", cmd);
         }
