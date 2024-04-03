@@ -11,12 +11,11 @@
 8. shell终端：实现一个shell终端（自己起名），内置了cat、ls、cd、mkdir、pwd、echo、vim、touch、rm、ps等常用的类Linux命令。
 9. 实现了操作系统级别的C语言泛型数据结构：锁、循环队列、哈希表等
 
-
 ## GOS架构图
 ![GOS Architecture Diagram](images/image.png)
 
 ## 代码分布与链接
-总目录链接：[开发目录文档索引](https://m13n4gzucg.feishu.cn/docx/Fth3d2wnAoOiNIxilF3cxOnpnwg)
+**★★★★★总目录链接：[开发目录文档索引](https://m13n4gzucg.feishu.cn/docx/Fth3d2wnAoOiNIxilF3cxOnpnwg)**
 | 分支         | 分支内容                                     | 对应文档链接                                                                                               |
 | ------------ | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
 | master       | 操作系统最终版本                             | 该README                                                                                                   |
