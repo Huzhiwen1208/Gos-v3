@@ -43,9 +43,10 @@
 | feature/lab9 | 进程调度算法、页面置换算法、磁盘调度算法实现 | [Location](https://m13n4gzucg.feishu.cn/docx/HdYddzbfuoetJwxzeVlcWkLmnWh#part-PuySdhnRXo5YzGxf2otcNewBn8b) |
 
 ## 未来计划
- 1.  实现虚拟文件系统。
- 2.  优化操作系统性能：磁盘读写--DMA方式；引入线程等。
- 3.  增加操作系统安全性：增加用户权限校验等。
- 4.  实现更为丰富的Shell命令行工具。如：vim、top、tree等。
- 5.  实现网络设备接口，网络功能。
- 6.  实现Desktop。
+ 1.  使开发文档更加完善易懂。
+ 2.  实现虚拟文件系统。
+ 3.  优化操作系统性能：磁盘读写--DMA方式；引入线程等。
+ 4.  增加操作系统安全性：增加用户权限校验等。
+ 5.  实现更为丰富的Shell命令行工具。如：vim、top、tree等。
+ 6.  实现网络设备接口，网络功能。
+ 7.  实现Desktop。
