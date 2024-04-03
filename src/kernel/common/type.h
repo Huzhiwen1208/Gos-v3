@@ -22,6 +22,7 @@ typedef unsigned int VirtualAddress;
 typedef unsigned int PhysicalPageNumber;
 
 typedef unsigned int PID;
+typedef unsigned int InodeID;
 
 // 可变参数列表
 typedef char* va_list;

@@ -34,6 +34,7 @@ Size ConsoleWriteWithColor(const char* buf, Size len, ConsoleColor color) {
         if (ch == BS) { // \b
             if (col > 0) {
                 col--;
+                *(currentPosition-1) = (u16)(color << 8 | Space);
             }
         } else if (ch == HT) { // \t
             col += 4;

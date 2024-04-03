@@ -4,7 +4,8 @@ extern void RestoreContext();
 
 /// @brief 让栈指针指向Interrupt Context方便返回用户态
 static void restore();
-
+static void copyPageTableRecursion(u32 childRootPPN, u32 parentRootPPN);
+static void freePageTableRecursion(u32 rootPPN);
 
 void CreateKernelProcess(void* entry) {
     PCB* process = (PCB*)Malloc(sizeof(PCB));
@@ -82,10 +83,149 @@ void CreateUserProcess(void* entry) {
     AddProcess(process);
 }
 
+PID ForkProcess() {
+    PCB* parent = GetCurrentProcess();
+    Assert(parent->Type == PROCESS_TYPE_USER);
+    
+    PCB* child = (PCB*)Malloc(sizeof(PCB));
+    child->ID = AllocatePID();
+    child->ParentID = parent->ID;
+    child->Status = parent->Status;
+    child->Type = parent->Type;
+
+    // 复制内核栈
+    u32 stack = AllocateOnePage(KernelMode) + PageSize;
+    MemoryCopy(stack - PageSize, GetAddressFromPPN(GetPPNFromAddressFloor(parent->KernelStackPointer)), PageSize);
+    // 复制页表
+    u32 childRootPPN = GetPPNFromAddressFloor(AllocateOnePage(KernelMode));
+    copyPageTableRecursion(childRootPPN, parent->RootPPN);
+    child->RootPPN = childRootPPN;
+
+    stack -= sizeof(InterruptContext);
+    InterruptContext* ctx = (InterruptContext*)stack;
+    ctx->EAX = 0; // 子进程应该返回0
+
+    stack -= sizeof(SwitchContext);
+    SwitchContext* sctx = (SwitchContext*)stack;
+    sctx->EIP = restore;
+    sctx->EBP = sctx->ESI = sctx->EDI = sctx->EBX = 0;
+
+    child->KernelStackPointer = (PhysicalAddress*)stack;
+
+    AddProcess(child);
+    Schedule();
+    return child->ID;
+}
+
+void ExitProcess(i32 exitCode) {
+    PCB* current = GetCurrentProcess();
+    current->Status = PROCESS_STATE_ZOMBIE;
+    current->ExitCode = exitCode;  // 退出码
+    FreePID(current->ID); // 释放PID
+    freePageTableRecursion(current->RootPPN); // 递归释放页表
+    // 释放内核栈
+    FreeOnePage(GetAddressFromPPN(GetPPNFromAddressFloor(current->KernelStackPointer)));
+
+    // 将所有的子进程挂到当前进程的父进程下
+    RedirectParentOfChildren();
+
+    Schedule();
+}
+
+/*
+    1. 如果遍历完所有Runnable进程和Zombie进程都没有找到，说明进程不存在，返回-1
+    2. 如果在Runnable进程中找到，说明进程还没退出，返回-2
+    3. 如果在Zombie进程中找到，说明进程已经退出，返回退出码并回收进程的PCB
+*/
+PID WaitProcess(PID pid, i32* exitCode) {
+    PCB* current = GetCurrentProcess();
+    
+    PCB* activatedChild = FindActivatedChildProcessByPID(pid);
+    PCB* zombieChild = TakeZombieProcess(pid);
+
+    if (activatedChild == NULL && zombieChild == NULL) {
+        return -1;
+    }
+
+    if (zombieChild == NULL) {
+        return -2;
+    }
+
+    // 存在僵尸子进程
+    *exitCode = zombieChild->ExitCode;
+
+    PID rid = zombieChild->ID;
+    Free(zombieChild); // 释放PCB
+    return rid;
+}
+
+static void freePageTableRecursion(u32 rootPPN) {
+    DisablePaging();
+    PageTableEntry* rootPTE = (PageTableEntry*)GetAddressFromPPN(rootPPN);
+    for (Size i = 1; i < 1024; i++) {
+        if (rootPTE[i].Present == 0) continue; // 不存在的页表项不释放
+
+        u32 secondPPN = rootPTE[i].NextPPN;
+        PageTableEntry* secondPTE = (PageTableEntry*)GetAddressFromPPN(secondPPN);
+        for (Size j = 0; j < 1024; j++) {
+            if (secondPTE[j].Present == 0) continue; // 不存在的页帧不释放
+
+            u32 thirdPPN = secondPTE[j].NextPPN;
+            FreeOnePage(GetAddressFromPPN(thirdPPN));
+        }
+        FreeOnePage(GetAddressFromPPN(secondPPN));
+    }
+    FreeOnePage(GetAddressFromPPN(rootPPN));
+    EnablePaging();
+}
+
 static void restore() {
     PCB* current = GetCurrentProcess();
     u32 stack = ((u32)current->KernelStackPointer + PageSize - 1) / PageSize * PageSize;
     stack -= sizeof(InterruptContext);
     asm volatile ("movl %0, %%esp" : : "m"(stack));
     asm volatile ("jmp RestoreContext");
+}
+
+static void copyPageTableRecursion(u32 childRootPPN, u32 parentRootPPN) {
+    // 1. 复制根页表
+    MemoryCopy(
+        GetAddressFromPPN(childRootPPN),
+        GetAddressFromPPN(parentRootPPN),
+        PageSize
+    );
+
+    // 2. 复制第二级页表
+    DisablePaging();
+    PageTableEntry* childPTE = (PageTableEntry*)GetAddressFromPPN(childRootPPN);
+    PageTableEntry* parentPTE = (PageTableEntry*)GetAddressFromPPN(parentRootPPN);
+    for (Size i = 1; i < 1024; i++) {
+        if (parentPTE[i].Present == 0) continue;
+
+        u32 parentPPN = parentPTE[i].NextPPN;
+        u32 childPPN = GetPPNFromAddressFloor(AllocateOnePage(UserMode));
+        childPTE[i].NextPPN = childPPN;
+        MemoryCopy(
+            GetAddressFromPPN(childPPN),
+            GetAddressFromPPN(parentPPN),
+            PageSize
+        );
+
+        // 3. 复制页帧，数据页
+        PageTableEntry* secondChildPTE = (PageTableEntry*)GetAddressFromPPN(childPPN);
+        PageTableEntry* secondParentPTE = (PageTableEntry*)GetAddressFromPPN(parentPPN);
+        for (Size j = 0; j < 1024; j++) {
+            if (secondParentPTE[j].Present == 0) continue;
+
+            u32 parentPFN = secondParentPTE[j].NextPPN;
+            u32 childPFN = GetPPNFromAddressFloor(AllocateOnePage(UserMode));
+            secondChildPTE[j].NextPPN = childPFN;
+            MemoryCopy(
+                GetAddressFromPPN(childPFN),
+                GetAddressFromPPN(parentPFN),
+                PageSize
+            );
+        }
+    }
+    EnablePaging();
 }

@@ -9,8 +9,8 @@ static u32 KernelRootPPN;
 // static methods declaration
 
 static void initPageTableEntry(PageTableEntry* pte, u32 nextPPN, Boolean user);
-static void enablePaging();
-static void disablePaging();
+static PageTableEntry* findPTE(VirtualAddress addr);
+static PageTableEntry* findPTECreate(VirtualAddress addr);
 
 // public methods
 
@@ -48,7 +48,26 @@ void InitializeMemoryMapping() {
     // 告知CPU根页表的物理地址
     SetRootPageTableAddr(GetAddressFromPPN(KernelRootPPN));
     // 通知CPU开启分页功能
-    enablePaging();
+    EnablePaging();
+}
+
+void MapPage(VirtualAddress addr) {
+    DisablePaging();
+    findPTECreate(addr);
+    EnablePaging();
+    FlushTLB(addr);
+}
+
+void EnablePaging() {
+    asm volatile ("movl %cr0, %eax");
+    asm volatile ("orl $0x80000000, %eax");
+    asm volatile ("movl %eax, %cr0");
+}
+
+void DisablePaging() {
+    asm volatile ("movl %cr0, %eax");
+    asm volatile ("andl $0x7FFFFFFF, %eax");
+    asm volatile ("movl %eax, %cr0");
 }
 
 // static methods implementation
@@ -67,14 +86,31 @@ static void initPageTableEntry(PageTableEntry* pte, u32 nextPPN, Boolean user) {
     pte->NextPPN = nextPPN;
 }
 
-static void enablePaging() {
-    asm volatile ("movl %cr0, %eax");
-    asm volatile ("orl $0x80000000, %eax");
-    asm volatile ("movl %eax, %cr0");
+static PageTableEntry* findPTE(VirtualAddress addr) {
+    PageTableEntry* rootPTE = (PageTableEntry*)GetRootPageTableAddr();
+    u32 firstIndex = addr >> 22;
+    u32 secondIndex = (addr >> 12) & 0x3ff;
+
+    PageTableEntry* pte = rootPTE + firstIndex;
+    if (pte->Present == 0) return NULL;
+    return (PageTableEntry*)GetAddressFromPPN(pte->NextPPN) + secondIndex;
 }
 
-static void disablePaging() {
-    asm volatile ("movl %cr0, %eax");
-    asm volatile ("andl $0x7FFFFFFF, %eax");
-    asm volatile ("movl %eax, %cr0");
+static PageTableEntry* findPTECreate(VirtualAddress addr) {
+    PageTableEntry* rootPTE = (PageTableEntry*)GetRootPageTableAddr();
+    u32 firstIndex = addr >> 22;
+    u32 secondIndex = (addr >> 12) & 0x3ff;
+
+    PageTableEntry* pte = rootPTE + firstIndex;
+    if (pte->Present == 0) {
+        PhysicalAddress secondPageTable = AllocateOnePage(UserMode);
+        initPageTableEntry(pte, GetPPNFromAddressFloor(secondPageTable), TRUE);
+    }
+    pte = (PageTableEntry*)GetAddressFromPPN(pte->NextPPN) + secondIndex;
+    if (pte->Present == 0) {
+        PhysicalAddress page = AllocateOnePage(UserMode);
+        initPageTableEntry(pte, GetPPNFromAddressFloor(page), TRUE);
+    }
+
+    return pte;
 }

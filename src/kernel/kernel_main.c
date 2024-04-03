@@ -4,12 +4,14 @@
 #include "memory/mod.h"
 #include "int/mod.h"
 #include "process/mod.h"
+#include "device/mod.h"
+#include "disk/mod.h"
+#include "fs/mod.h"
+#include "ds/mod.h"
 
 void KernelMain() {
     // 清空屏幕，初始化控制台
     InitializeConsole();
-    // 使用可变参数列表实现的Printf
-    Printf("Hello, World! This is OS Printf\n");
     // 初始化内存管理
     InitMemoryManager();
     // 初始化中断异常处理
@@ -20,7 +22,19 @@ void KernelMain() {
     InitializeGDT();
     // 初始化虚拟分页
     InitializeMemoryMapping();
+    // 初始化异常处理
+    InitializePageFaultHandler();
+    // 初始化时钟中断
+    InitializeClock();
+    // 初始化键盘中断
+    InitializeKeyboard();
+    // 初始化设备表
+    InitializeDevice();
+    // 初始化磁盘
+    InitializeIdeDisk();
+    // 初始化文件系统
+    InitializeFileSystem();
 
-    // TestKernelProcessWithPaging();
-    TestUserProcessWithPageing();
+    // KernelMainTest();
+    GotoGshell();
 }

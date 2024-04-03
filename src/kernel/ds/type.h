@@ -21,3 +21,29 @@ typedef struct HashTable {
     void (*Put)(struct HashTable* self, void* key, void* value);
     void (*Delete)(struct HashTable* self, void* key);
 } HashTable;
+
+
+// queue
+typedef struct Queue {
+    i32 Front;
+    i32 Rear;
+    void** Value;
+    i32 MallocSize;
+    char* Type;
+
+    void (*Push)(struct Queue* self, void* value);
+    void* (*Pop)(struct Queue* self);
+    Boolean (*Empty)(struct Queue* self);
+} Queue;
+
+// reentrant lock
+typedef struct ReentrantLock {
+    Boolean Locked;
+    Boolean Initialized;
+    u32 EntrantCount;
+    void* Owner; // 锁的当前占用者
+    Queue* WaitQueue;
+    
+    void (*Lock)(struct ReentrantLock* self);
+    void (*Unlock)(struct ReentrantLock* self);
+} ReentrantLock;

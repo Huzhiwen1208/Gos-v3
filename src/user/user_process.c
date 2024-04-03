@@ -1,10 +1,14 @@
 #include "stdlib.h"
 
 void user_process() {
-    while(1) {
-        int a = 32;
-        a = 2 + 3;
-        a = 12 + 5;
-        SyscallTest();
+    while (1) {
+        int pid = Fork();
+        if (pid == 0) {
+            shell();
+        }else {
+            // 父进程
+            i32 exitCode;
+            WaitPid(pid, &exitCode);
+        }
     }
 }

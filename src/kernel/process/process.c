@@ -14,7 +14,7 @@ static Boolean isEmpty();
 void InitializeProcessManager() {
     processManager.Current = NULL;
     for (int i = 0; i < MAX_PROCESS_COUNT; i++) {
-        processManager.RunnableProcesses[i] = NULL;
+        processManager.RunnableProcesses[i] = processManager.ZombieProcesses[i] = NULL;
     }
     processManager.Front = processManager.Rear = 0;
     CreateKernelProcess(idle);
@@ -51,6 +51,17 @@ void AddProcess(PCB* process) {
     processManager.Rear = (processManager.Rear + 1) % MAX_PROCESS_COUNT;
 }
 
+void AddProcessToZombie(PCB* process) {
+    for (i32 i = 0; i < MAX_PROCESS_COUNT; i++) {
+        if (processManager.ZombieProcesses[i] == NULL) {
+            processManager.ZombieProcesses[i] = process;
+            return;
+        }
+    }
+
+    Panic("The zombie process queue is full");
+}
+
 void Schedule() {
     // 如果就绪队列里没有进程，并且当前进程也不存在，说明还未初始化进程管理器，直接退出即可
     if (processManager.Current == NULL && isEmpty()) {
@@ -65,9 +76,13 @@ void Schedule() {
     
     // 如果就绪队列里有进程，并且当前进程存在，说明可以执行切换
     PCB* current = processManager.Current;
-    if (current->ID && current->Status != PROCESS_STATE_BLOCKED) {
+    if (current->ID && current->Status != PROCESS_STATE_BLOCKED && current->Status != PROCESS_STATE_ZOMBIE) {
         current->Status = PROCESS_STATE_RUNNABLE;
         AddProcess(current);
+    }
+
+    if (current->ID && current->Status == PROCESS_STATE_ZOMBIE) {
+        AddProcessToZombie(current);
     }
 
     PCB* next = fetchProcess();
@@ -84,6 +99,49 @@ void Schedule() {
     processManager.Current = next;
     SwitchProcess(current, next);
 }
+
+// 将当前进程的所有子进程的父进程设置为当前进程的父进程（包括Ready、Zombie）
+void RedirectParentOfChildren() {
+    PCB* current = processManager.Current;
+    for (i32 i = processManager.Front ; i < processManager.Rear; i = (i + 1) % MAX_PROCESS_COUNT) {
+        PCB* process = (PCB*)processManager.RunnableProcesses[i];
+        if (process && process->ParentID == current->ID) {
+            process->ParentID = current->ParentID;
+        }
+    }
+
+    for (i32 i = 0 ; i < MAX_PROCESS_COUNT; i++) {
+        PCB* process = (PCB*)processManager.ZombieProcesses[i];
+        if (process && process->ParentID == current->ID) {
+            process->ParentID = current->ParentID;
+        }
+    }
+}
+
+PCB* FindActivatedChildProcessByPID(PID pid) {
+    PCB* current = processManager.Current;
+    for (i32 i = processManager.Front; i < processManager.Rear; i = (i + 1) % MAX_PROCESS_COUNT) {
+        PCB* process = (PCB*)processManager.RunnableProcesses[i];
+        if (process && process->ParentID == current->ID && (process->ID == pid || pid == -1)) {
+            return process;
+        }
+    }
+    return NULL;
+}
+
+PCB* TakeZombieProcess(PID pid) {
+    PCB* current = processManager.Current;
+    for (i32 i = 0; i < MAX_PROCESS_COUNT; i++) {
+        PCB* process = (PCB*)processManager.ZombieProcesses[i];
+        if (process && process->ParentID == current->ID && (process->ID == pid || pid == -1)) {
+            processManager.ZombieProcesses[i] = NULL;
+            return process;
+        }
+    }
+
+    return NULL;
+}
+
 
 // static methods implement
 
