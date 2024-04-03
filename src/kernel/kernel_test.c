@@ -1,6 +1,7 @@
 #include "common/mod.h"
 #include "lib/mod.h"
-#include "console/mod.h"
+#include "console/type.h"
+#include "console/method.h"
 #include "memory/mod.h"
 #include "int/mod.h"
 #include "process/mod.h"

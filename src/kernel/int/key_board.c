@@ -277,7 +277,11 @@ static void keyboardHandler(int vector) {
     Printf("%c", ch);
     // 写入缓冲区
     if (globalBuffer) {
-        globalBuffer[globalBufferLength++] = ch;
+        if (ch == BS && globalBufferLength >= 1) {
+            globalBufferLength --;
+        }else {
+            globalBuffer[globalBufferLength++] = ch;
+        }
     }
 
     // 写入globalChar
