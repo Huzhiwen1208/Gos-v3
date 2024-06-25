@@ -462,7 +462,7 @@ void ListFiles(String option, String path) {
                         Printf("%s", entry->Name);
                     }
                 }else {
-                    if (StringStartWith(entry->Name, "."))
+                    if (StringStartWith(entry->Name, ".") == TRUE)
                         continue;
 
                     if (isDirectory(entry->InodeID)) {

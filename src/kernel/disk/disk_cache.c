@@ -2,13 +2,20 @@
 
 static HashTable* diskCacheMap; // key: blockID(lba) value: PhysicalAddress
 static PhysicalAddress currentCachePtr; // 当前空块缓存地址，每次使用后，+= 512
+static Boolean disableDiskCache = TRUE;
 
 void InitializeDiskCache() {
     diskCacheMap = NewMap("u32", "PhysicalAddress");
     currentCachePtr = BlockCacheStart;
+    // disableDiskCache = FALSE;
 }
 
 void DiskCacheRead(u32 blockID, void *buffer) {
+    if (disableDiskCache) {
+        DeviceRead(1, blockID, 1, buffer);
+        return;
+    }
+
     PhysicalAddress address = (PhysicalAddress)diskCacheMap->Get(diskCacheMap, blockID);
     // 如果缓存中没有，就从磁盘中读取, 并将读取的数据放入缓存中
     if (address == NULL) {
@@ -29,6 +36,11 @@ void DiskCacheRead(u32 blockID, void *buffer) {
 
 // 全写法，写入缓存，紧接着再写入磁盘
 void DiskCacheWrite(u32 blockID, void *buffer) {
+    if (disableDiskCache) {
+        DeviceWrite(1, blockID, 1, buffer);
+        return;
+    }
+
     PhysicalAddress address = (PhysicalAddress)diskCacheMap->Get(diskCacheMap, blockID);
     if (address) {
         // 缓存存在，写入缓存

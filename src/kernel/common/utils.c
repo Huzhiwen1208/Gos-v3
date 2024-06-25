@@ -45,7 +45,8 @@ Boolean StringEqual(const char* str1, const char* str2) {
     return TRUE;
 }
 
-Boolean StringStartWith(const String str1, const String start) {
+
+inline Boolean StringStartWith(const String str1, const String start) {
     Size len1 = StringLength(str1);
     Size len2 = StringLength(start);
     if (len1 < len2) {
