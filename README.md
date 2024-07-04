@@ -43,6 +43,7 @@
 | feature/lab9 | 进程调度算法、页面置换算法、磁盘调度算法实现 | [Location](https://m13n4gzucg.feishu.cn/docx/HdYddzbfuoetJwxzeVlcWkLmnWh#part-PuySdhnRXo5YzGxf2otcNewBn8b) |
 
 ## 未来计划
+ 0.  加入串口设备UART，因为当前的输入输出问题很大。
  1.  使开发文档更加完善易懂。
  2.  实现虚拟文件系统。
  3.  优化操作系统性能：磁盘读写--DMA方式；引入线程等。
