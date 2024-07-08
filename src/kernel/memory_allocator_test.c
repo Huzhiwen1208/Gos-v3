@@ -58,4 +58,6 @@ void testStableAllocator() {
 
     StableFree(p3);
     StableFree(p2);
+
+    Printf("StableAllocator test passed\n");
 }

@@ -29,5 +29,4 @@ void KernelMain() {
         // // 2. 测试StableAllocator
         testStableAllocator();
     }
-    
 }
