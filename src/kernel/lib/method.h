@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../common/method.h"
+#include "../console/type.h"
 
 Size Printf(const char *fmt, ...);
 Size Println(const char *fmt, ...);
