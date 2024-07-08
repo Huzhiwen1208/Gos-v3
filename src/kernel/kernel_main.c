@@ -17,7 +17,7 @@ void KernelMain() {
     testBuddyAllocator();
 
     // 实验1内容如下，在完成实验1后，修改done的值为True
-    Boolean done = TRUE;
+    Boolean done = FALSE;
     if (done) {
         // 1. 测试日志信息
         Debug("This is Debug");
