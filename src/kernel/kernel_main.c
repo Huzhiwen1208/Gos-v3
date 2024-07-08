@@ -1,5 +1,6 @@
 #include "common/mod.h"
-#include "console/mod.h"
+#include "console/type.h"
+#include "console/method.h"
 
 void KernelMain() {
     String message = "Hello kernel output";
