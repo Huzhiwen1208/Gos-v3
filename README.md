@@ -5,17 +5,17 @@
 2. 进程管理：实现了进程调度与管理；用户级进程；
 3. 中断：外中断，实现了时钟中断和键盘中断；
 4. 异常：实现了缺页异常、除零异常、保护异常等20个异常处理。
-5. 系统调用：实现了SYSCALL_GET_TIME，SYSCALL_READ，SYSCALL_WRITE，SYSCALL_GET_PID，SYSCALL_GET_PPID，SYSCALL_YIELD，SYSCALL_EXIT，SYSCALL_WAIT_PID，SYSCALL_TASK_INFO，SYSCALL_MMAP，SYSCALL_MUNMAP，SYSCALL_SLEEP等诸多系统调用
+5. 系统调用：实现了SYSCALL_GET_TIME，SYSCALL_READ，SYSCALL_WRITE，SYSCALL_GET_PID，SYSCALL_GET_PPID，SYSCALL_YIELD，SYSCALL_EXIT，SYSCALL_WAIT_PID，SYSCALL_FORK，SYSCALL_TASK_INFO，SYSCALL_MMAP，SYSCALL_MUNMAP，SYSCALL_SLEEP等诸多系统调用
 6. 磁盘IO：实现了PIO（可编程输入输出） 读写磁盘；设备管理器的实现；
 7. 文件系统：实现了一个Inode文件系统，采用27个直接索引、1个一级索引、1个二级索引。并提供了PrintfWorkingDirectory、ChangeDirectory、ListFiles、MakeDirectory、CreateFile、ClearFileContent、ReadFileLine、WriteFileContent、PrintFileContent、RemoveFile、GetFileDescriptorByFileName等诸多文件操作。
-8. shell终端：实现一个shell终端（自己起名），内置了cat、ls、cd、mkdir、pwd、echo、vim、touch、rm、ps等常用的类Linux命令。
+8. shell终端：实现一个shell终端（gshell），内置了cat、ls、cd、mkdir、pwd、echo、vim、touch、rm、ps等常用的类Linux命令，可以后续添加。
 9. 实现了操作系统级别的C语言泛型数据结构：锁、循环队列、哈希表等
 
 ## GOS架构图
 ![GOS Architecture Diagram](images/image.png)
 
 ## 代码分布与链接
-**★★★★★总目录链接：[开发目录文档索引](https://m13n4gzucg.feishu.cn/docx/Fth3d2wnAoOiNIxilF3cxOnpnwg)**
+**★★★★★总目录链接：[开发目录文档索引](https://m13n4gzucg.feishu.cn/docx/P2oKdF4OBo19oWxzCN6cjZcenpc)**
 | 分支         | 分支内容                                     | 对应文档链接                                                                                               |
 | ------------ | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
 | master       | 操作系统最终版本                             | 该README                                                                                                   |
