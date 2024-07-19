@@ -1,4 +1,6 @@
-#include "mod.h"
+#include "method.h"
+#include "type.h"
+#include "../console/method.h"
 
 static Size SkipAtoi(const char **s) {
     Size i = 0;

@@ -1,4 +1,8 @@
-#include "mod.h"
+#include "method.h"
+#include "type.h"
+#include "../gdt/method.h"
+#include "../lib/method.h"
+#include "../memory/method.h"
 
 static ProcessManager processManager;
 static PIDAllocator pidAllocator;

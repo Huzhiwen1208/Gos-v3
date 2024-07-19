@@ -17,6 +17,7 @@ typedef struct HashTable {
     char* ValueType;
     Boolean Initialized;
 
+    /* Cast numeric IDs to void* when using them as keys or values. */
     void* (*Get)(struct HashTable* self, void* key);
     void (*Put)(struct HashTable* self, void* key, void* value);
     void (*Delete)(struct HashTable* self, void* key);

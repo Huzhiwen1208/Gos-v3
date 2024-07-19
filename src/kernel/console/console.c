@@ -1,4 +1,7 @@
-#include "mod.h"
+#include "../memory/method.h"
+#include "../common/method.h"
+#include "method.h"
+#include "type.h"
 
 static Cursor newCursor(u32 row, u32 col);
 /// @brief 获得当前屏幕的内存起始地址

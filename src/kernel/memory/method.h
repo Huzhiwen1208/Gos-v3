@@ -1,6 +1,6 @@
 #pragma once
-
-#include "mod.h"
+#include "../common/type.h"
+#include "type.h"
 
 // Page manager
 PhysicalAddress AllocateOnePage(MachineMode mode);
@@ -28,6 +28,7 @@ void StableFree(PhysicalAddress address);
 void SetRootPageTableAddr(PhysicalAddress addr);
 PhysicalAddress GetRootPageTableAddr();
 void FlushTLB(VirtualAddress addr);
+void MapPage(VirtualAddress addr);
 void InitializeMemoryMapping();
 
 void EnablePaging();

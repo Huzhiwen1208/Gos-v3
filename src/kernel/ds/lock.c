@@ -1,4 +1,10 @@
-#include "mod.h"
+#include "method.h"
+#include "type.h"
+#include "../common/method.h"
+#include "../lib/method.h"
+#include "../memory/method.h"
+#include "../process/method.h"
+#include "../process/type.h"
 
 // static methods declaration
 

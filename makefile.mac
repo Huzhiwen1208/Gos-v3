@@ -1,0 +1,7 @@
+include Makefile
+
+CCompile=x86_64-elf-gcc
+LdCompile=x86_64-elf-ld
+ObjcopyCompile=llvm-objcopy
+GccFlags=-std=gnu11 -m32 -fno-builtin -fno-stack-protector -mno-sse
+GccFlags+=-w -nostdinc -nostdlib -fno-pic -fno-pie -g

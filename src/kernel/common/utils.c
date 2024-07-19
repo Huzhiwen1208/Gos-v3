@@ -1,4 +1,5 @@
-#include "mod.h"
+#include "method.h"
+#include "type.h"
 
 void MemoryCopy(void* dest, const void* src, Size size) {
     u8* dest8 = (u8*)dest;
