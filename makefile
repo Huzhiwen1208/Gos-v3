@@ -1,3 +1,4 @@
+MAC ?= 0
 AsmCompile=nasm
 CCompile=gcc
 IMG=img/gos.img
@@ -102,3 +103,9 @@ clean:
 	rm -rf img
 	rm -rf src/target
 	rm -rf target
+
+run-mac: build-mac
+	@make run -f makefile.mac
+
+build-mac:
+	@make build -f makefile.mac
