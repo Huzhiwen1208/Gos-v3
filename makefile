@@ -87,8 +87,11 @@ clean:
 	rm -rf src/target
 	rm -rf target
 
-run-mac: build-mac
+run-mac:
 	@make run -f makefile.mac
+
+debug-mac:
+	@make debug -f makefile.mac
 
 build-mac:
 	@make build -f makefile.mac
