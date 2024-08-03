@@ -50,3 +50,11 @@ typedef struct DescriptorTablePointer DescriptorTablePointer;
 
 // 键盘中断
 #define KeyboardDataPort 0x60 // 键盘数据寄存器端口
+
+#define MAX_SYSCALL_NUM 1024
+typedef struct TaskInfo {
+    PID pid;
+    ProcessState status;
+    u32 time;
+    u32 call[MAX_SYSCALL_NUM];
+} TaskInfo;

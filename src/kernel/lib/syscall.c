@@ -56,3 +56,20 @@ PID WaitPid(PID pid, i32* exitCode) {
 PID GetPPID() {
     SystemCall(SYSCALL_GET_PPID, 0, 0, 0);
 }
+
+// TODO: implement the following functions
+void GetTaskInfo(TaskInfo* info) {
+    Panic("Not implemented yet");
+}
+
+i32 MMap(u32 start, u32 len, u32 prot) {
+    Panic("Not implemented yet");
+}
+
+i32 MUnmap(u32 start, u32 len) {
+    Panic("Not implemented yet");
+}
+
+void Sleep(u32 time) {
+    Panic("Not implemented yet");
+}
