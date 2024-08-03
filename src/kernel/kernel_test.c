@@ -1,6 +1,7 @@
 #include "common/mod.h"
 #include "lib/mod.h"
-#include "console/mod.h"
+#include "console/method.h"
+#include "console/type.h"
 #include "memory/mod.h"
 #include "int/mod.h"
 #include "process/mod.h"
@@ -9,6 +10,7 @@
 void ProcessA();
 void ProcessB();
 void ProcessC();
+extern void idle_user_task();
 extern void user_process();
 extern void syscall_get_time_test1();
 extern void syscall_get_time_test2();
@@ -22,6 +24,11 @@ extern void syscall_exit_test2();
 extern void syscall_wait_pid_test();
 extern void syscall_get_ppid_test();
 
+extern void TestSyscallGetTaskInfo();
+extern void TestSyscallMmap();
+extern void TestSyscallMunmap();
+extern void TestSyscallSleep();
+
 // 测试方法列表
 void TestKernelProcessWithPaging();  // 分页开启后的内核级进程调度测试
 void TestUserProcessWithPageing();  // 分页开启后的用户级进程调度测试
@@ -33,6 +40,8 @@ void TestSyscallExit();             // 系统调用Exit测试
 void TestSyscallWaitPid();             // 系统调用WaitPid测试
 void TestSyscallGetPPID();             // 系统调用GetPPID测试
 
+void TestLab6();                    // 实验6测试
+
 // 测试套件，主测试方法
 void KernelMainTest() {
     // TestKernelProcessWithPaging();
@@ -43,7 +52,8 @@ void KernelMainTest() {
     // TestSyscallGetPid();
     // TestSyscallExit();
     // TestSyscallWaitPid();
-    TestSyscallGetPPID();
+    // TestSyscallGetPPID();
+    TestLab6();
 }
 
 
@@ -114,4 +124,13 @@ void ProcessC() {
         PrintWithColor(BLUE, "This is C process\n");
         Schedule();
     }
+}
+
+void TestLab6() {
+    CreateUserProcess(TestSyscallGetTaskInfo);
+    CreateUserProcess(TestSyscallMmap);
+    CreateUserProcess(TestSyscallMunmap);
+    CreateUserProcess(TestSyscallSleep);
+    CreateUserProcess(idle_user_task);
+    Schedule();
 }

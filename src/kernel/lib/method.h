@@ -25,3 +25,7 @@ void ErrorHandle(const char *file, i32 line, const char *fmt, ...);
 #define Info(fmt, ...) InfoHandle(__FILE__, __LINE__, fmt, ##__VA_ARGS__)
 #define Warn(fmt, ...) WarnHandle(__FILE__, __LINE__, fmt, ##__VA_ARGS__)
 #define Error(fmt, ...) ErrorHandle(__FILE__, __LINE__, fmt, ##__VA_ARGS__)
+
+void GetTaskInfo(TaskInfo* info);
+i32 MMap(u32 start, u32 len, u32 prot);
+i32 MUnmap(u32 start, u32 len);

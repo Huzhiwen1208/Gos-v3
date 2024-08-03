@@ -56,3 +56,32 @@ PID WaitPid(PID pid, i32* exitCode) {
 PID GetPPID() {
     SystemCall(SYSCALL_GET_PPID, 0, 0, 0);
 }
+
+// TODO: implement the following functions
+void GetTaskInfo(TaskInfo* info) {
+    while (1) {
+        for (int i = 0; i < 100000000; i++); // 类似于sleep作用
+        printf("GetTaskInfo Not implemented yet\n");
+    }
+}
+
+i32 MMap(u32 start, u32 len, u32 prot) {
+    while (1) {
+        for (int i = 0; i < 100000000; i++); // 类似于sleep作用
+        printf("MMap Not implemented yet\n");
+    }
+}
+
+i32 MUnmap(u32 start, u32 len) {
+    while (1) {
+        for (int i = 0; i < 100000000; i++); // 类似于sleep作用
+        printf("MUnmap Not implemented yet\n");
+    }
+}
+
+void Sleep(u32 time) {
+    while (1) {
+        for (int i = 0; i < 100000000; i++); // 类似于sleep作用
+        printf("Sleep Not implemented yet\n");
+    }
+}
