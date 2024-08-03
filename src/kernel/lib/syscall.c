@@ -59,17 +59,29 @@ PID GetPPID() {
 
 // TODO: implement the following functions
 void GetTaskInfo(TaskInfo* info) {
-    Panic("Not implemented yet");
+    while (1) {
+        for (int i = 0; i < 100000000; i++); // 类似于sleep作用
+        printf("GetTaskInfo Not implemented yet\n");
+    }
 }
 
 i32 MMap(u32 start, u32 len, u32 prot) {
-    Panic("Not implemented yet");
+    while (1) {
+        for (int i = 0; i < 100000000; i++); // 类似于sleep作用
+        printf("MMap Not implemented yet\n");
+    }
 }
 
 i32 MUnmap(u32 start, u32 len) {
-    Panic("Not implemented yet");
+    while (1) {
+        for (int i = 0; i < 100000000; i++); // 类似于sleep作用
+        printf("MUnmap Not implemented yet\n");
+    }
 }
 
 void Sleep(u32 time) {
-    Panic("Not implemented yet");
+    while (1) {
+        for (int i = 0; i < 100000000; i++); // 类似于sleep作用
+        printf("Sleep Not implemented yet\n");
+    }
 }

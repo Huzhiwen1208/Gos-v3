@@ -1,6 +1,7 @@
 #include "common/mod.h"
 #include "lib/mod.h"
-#include "console/mod.h"
+#include "console/method.h"
+#include "console/type.h"
 #include "memory/mod.h"
 #include "int/mod.h"
 #include "process/mod.h"
@@ -9,6 +10,7 @@
 void ProcessA();
 void ProcessB();
 void ProcessC();
+extern void idle_user_task();
 extern void user_process();
 extern void syscall_get_time_test1();
 extern void syscall_get_time_test2();
@@ -129,5 +131,6 @@ void TestLab6() {
     CreateUserProcess(TestSyscallMmap);
     CreateUserProcess(TestSyscallMunmap);
     CreateUserProcess(TestSyscallSleep);
+    CreateUserProcess(idle_user_task);
     Schedule();
 }

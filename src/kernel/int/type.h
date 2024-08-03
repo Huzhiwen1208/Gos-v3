@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../common/type.h"
+#include "../process/type.h"
 
 #define INTERRUPT_COUNT 256
 #define EXCEPTION_COUNT 32

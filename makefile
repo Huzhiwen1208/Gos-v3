@@ -99,3 +99,6 @@ run-mac: build-mac
 
 build-mac:
 	@make build -f makefile.mac
+
+debug-mac:
+	@make debug -f makefile.mac
