@@ -31,6 +31,10 @@ static void clockInterruptHandler(u32 vector) {
     Assert(vector == ClockVector);
     jiffies++;
     OuteralInterruptCompleted(vector);
+
+    // 唤醒睡着的
+    WackupSleepProcesses();
+
     Schedule();
 }
 

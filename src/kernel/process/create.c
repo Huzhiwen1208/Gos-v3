@@ -80,6 +80,7 @@ void CreateUserProcess(void* entry) {
     context->EBX = 0;
     process->KernelStackPointer = (PhysicalAddress*)stack;
 
+    process->CreateTime = GetTimeMS(); // 创建时间
     AddProcess(process);
 }
 

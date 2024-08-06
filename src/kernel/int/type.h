@@ -37,6 +37,8 @@ typedef struct DescriptorTablePointer DescriptorTablePointer;
 #define SYSCALL_WAIT_PID 555
 #define SYSCALL_GET_TIME 888
 #define SYSCALL_READ 999
+#define SYSCALL_TASK_INFO 666
+#define SYSCALL_SLEEP 66
 
 // 时钟中断
 #define ClockCounter0 0x40  // 计数器0
@@ -54,8 +56,8 @@ typedef struct DescriptorTablePointer DescriptorTablePointer;
 
 #define MAX_SYSCALL_NUM 1024
 typedef struct TaskInfo {
-    PID pid;
-    ProcessState status;
-    u32 time;
-    u32 call[MAX_SYSCALL_NUM];
+    PID pid;   // pid
+    ProcessState status; // status
+    u32 time; // 调用task info的时刻  -  上处理器的时（创建进程）
+    u32 call[MAX_SYSCALL_NUM];  // 系统调用次数记录
 } TaskInfo;

@@ -7,10 +7,18 @@ void TestSyscallSleep();            // 系统调用Sleep测试
 
 void TestSyscallGetTaskInfo() {
     TaskInfo info;
+    for (int i = 0; i < 100000; i++);
+    int pid = GetPID();
+    pid = GetPID();
+    pid = GetPID();
+    pid = GetPID();
+    pid = GetPID();
     GetTaskInfo(&info);
     printf("[TestSyscallGetTaskInfo] pid: %d, status: %d, time: %d\n", info.pid, info.status, info.time);
-    for (int i = 0; i < 10; i++) {
-        printf("[TestSyscallGetTaskInfo] syscall [%d] invoked num: %d\n", i, info.call[i]);
+    for (int i = 0; i < MAX_SYSCALL_NUM; i++) {
+        if (info.call[i] > 0) {
+            printf("[TestSyscallGetTaskInfo] syscall [%d] invoked num: %d\n", i, info.call[i]);
+        }
     }
     Exit(0);
 }
@@ -57,10 +65,12 @@ void TestSyscallMunmap() {
 }
 
 void TestSyscallSleep() {
-    u32 time = 1000; // ms
-    printf("[TestSyscallSleep] sleep start %d ms\n", time);
-    Sleep(time);
-    printf("[TestSyscallSleep] sleep end %d ms\n", time);
+    u32 sleep_time = 1000; // ms
+    u32 time = GetTime();
+    printf("[TestSyscallSleep] sleep start at %d ms\n", time);
+    Sleep(sleep_time);
+    time = GetTime();
+    printf("[TestSyscallSleep] sleep end at %d ms\n", time);
     Exit(0);
 }
 

@@ -40,7 +40,29 @@ static PID syscallGetPPID() {
     return GetCurrentProcess()->ParentID;
 }
 
+static void syscallTaskInfo(TaskInfo* info) {
+    PCB* current = GetCurrentProcess();
+    info->pid = current->ID;
+    info->status = current->Status;
+
+    int current_time = GetTimeMS(); // 当前时间
+    int create_time = current->CreateTime; // 创建时间
+    info->time = current_time - create_time;
+
+    for (int i = 0; i < MAX_SYSCALL_NUM; i++) {
+        info->call[i] = current->SyscallTimes[i];
+    }
+
+    info->call[SYSCALL_TASK_INFO]++;
+}
+
+static void syscallSleep(u32 sleepTime) {
+    GetCurrentProcess()->WackupTime = GetTimeMS() + sleepTime;
+    SleepProcess(GetCurrentProcess());
+}
+
 u32 TrapHandler(u32 syscallNum, u32 arg1, u32 arg2, u32 arg3) {
+    u32 result = 0;
     switch (syscallNum) {
         case SYSCALL_TEST:
             syscallTest(arg1, arg2, arg3);
@@ -49,26 +71,40 @@ u32 TrapHandler(u32 syscallNum, u32 arg1, u32 arg2, u32 arg3) {
             syscallWrite((String)arg1, (Size)arg2);
             break;
         case SYSCALL_FORK:
-            return syscallFork();
+            result = syscallFork();
+            break;
         case SYSCALL_YIELD:
             syscallYield();
             break;
         case SYSCALL_READ:
-            return syscallRead(arg1, arg2);
+            result = syscallRead(arg1, arg2);
+            break;
         case SYSCALL_GET_PID:
-            return syscallGetPid();
+            result = syscallGetPid();
+            break;
         case SYSCALL_GET_TIME:
-            return syscallGetTime();
+            result = syscallGetTime();
+            break;
         case SYSCALL_EXIT:
             syscallExit(arg1);
             break;
         case SYSCALL_WAIT_PID:
-            return syscallWaitPid(arg1, arg2);
+            result = syscallWaitPid(arg1, arg2);
+            break;
         case SYSCALL_GET_PPID:
-            return syscallGetPPID();
+            result = syscallGetPPID();
+            break;
+        case SYSCALL_TASK_INFO:
+            syscallTaskInfo((TaskInfo*)arg1);
+            return;
+        case SYSCALL_SLEEP:
+            syscallSleep(arg1);
+            break;
         default:
             Panic("Unknown syscall number: %d", syscallNum);
     }
 
-    return 0;
+    PCB* current = GetCurrentProcess();
+    current->SyscallTimes[syscallNum]++;
+    return result;
 }

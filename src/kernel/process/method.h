@@ -17,3 +17,6 @@ PCB* FindActivatedChildProcessByPID(PID pid);
 PCB* TakeZombieProcess(PID pid);
 void ExitProcess(i32 exitCode);
 PID WaitProcess(PID pid, i32* exitCode);
+
+void AddProcessToSleep(PCB* process);
+void WackupSleepProcesses();

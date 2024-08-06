@@ -59,10 +59,7 @@ PID GetPPID() {
 
 // TODO: implement the following functions
 void GetTaskInfo(TaskInfo* info) {
-    while (1) {
-        for (int i = 0; i < 100000000; i++); // 类似于sleep作用
-        printf("GetTaskInfo Not implemented yet\n");
-    }
+    SystemCall(SYSCALL_TASK_INFO, (u32)((void*)info), 0, 0);
 }
 
 i32 MMap(u32 start, u32 len, u32 prot) {
@@ -80,8 +77,5 @@ i32 MUnmap(u32 start, u32 len) {
 }
 
 void Sleep(u32 time) {
-    while (1) {
-        for (int i = 0; i < 100000000; i++); // 类似于sleep作用
-        printf("Sleep Not implemented yet\n");
-    }
+    SystemCall(SYSCALL_SLEEP, time, 0, 0);
 }

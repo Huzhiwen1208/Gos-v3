@@ -14,7 +14,9 @@ static Boolean isEmpty();
 void InitializeProcessManager() {
     processManager.Current = NULL;
     for (int i = 0; i < MAX_PROCESS_COUNT; i++) {
-        processManager.RunnableProcesses[i] = processManager.ZombieProcesses[i] = NULL;
+        processManager.RunnableProcesses[i] = 
+            processManager.ZombieProcesses[i] = 
+            processManager.SleepProcesses[i] = NULL;
     }
     processManager.Front = processManager.Rear = 0;
     CreateKernelProcess(idle);
@@ -62,6 +64,33 @@ void AddProcessToZombie(PCB* process) {
     Panic("The zombie process queue is full");
 }
 
+void SleepProcess(PCB* process) {
+    process->Status = PROCESS_STATE_BLOCKED;
+    Schedule();
+}
+
+void AddProcessToSleep(PCB* process) {
+     for (i32 i = 0; i < MAX_PROCESS_COUNT; i++) {
+        if (processManager.SleepProcesses[i] == NULL) {
+            processManager.SleepProcesses[i] = process;
+            return;
+        }
+    }
+
+    Panic("The sleep process queue is full");
+}
+
+void WackupSleepProcesses() {
+    int current_time = GetTimeMS();
+    for (int i = 0; i < MAX_PROCESS_COUNT; i++) {
+        PCB* process = processManager.SleepProcesses[i];
+        if (process && process->WackupTime <= current_time) {
+            AddProcess(process);
+            processManager.SleepProcesses[i] = NULL;
+        }
+    }
+}
+
 void Schedule() {
     // 如果就绪队列里没有进程，并且当前进程也不存在，说明还未初始化进程管理器，直接退出即可
     if (processManager.Current == NULL && isEmpty()) {
@@ -83,6 +112,10 @@ void Schedule() {
 
     if (current->ID && current->Status == PROCESS_STATE_ZOMBIE) {
         AddProcessToZombie(current);
+    }
+
+    if (current->ID && current->Status == PROCESS_STATE_BLOCKED) {
+        AddProcessToSleep(current);
     }
 
     PCB* next = fetchProcess();

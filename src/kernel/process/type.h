@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../common/type.h"
+#define MAX_SYSCALL_NUM 1024
 
 typedef enum ProcessState {
     PROCESS_STATE_RUNNABLE,
@@ -22,6 +23,10 @@ typedef struct PCB {
     ProcessType Type;
     u32 RootPPN;
     i32 ExitCode;
+
+    u32 CreateTime; // 创建时间ms
+    u32 SyscallTimes[MAX_SYSCALL_NUM];  // 系统调用次数记录
+    u32 WackupTime; // 进程Sleep后的醒来时间
 } PCB;
 
 // PID allocator
@@ -38,6 +43,7 @@ typedef struct ProcessManager {
     u32 Rear;
 
     PCB* ZombieProcesses[MAX_PROCESS_COUNT];
+    PCB* SleepProcesses[MAX_PROCESS_COUNT];
 } ProcessManager;
 
 // Process Need
