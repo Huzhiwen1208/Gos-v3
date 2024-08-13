@@ -61,6 +61,46 @@ static void syscallSleep(u32 sleepTime) {
     SleepProcess(GetCurrentProcess());
 }
 
+static i32 syscallMmap(u32 start, u32 len, u32 prot) {
+    if (start % PageSize != 0) {
+        Panic("start address must be page aligned");
+    }
+
+    if (prot &!0x7 != 0) {
+        Panic("invalid prot flags");
+    }
+
+    if (prot & 0x7 == 0) {
+        Panic("prot flags must be set");
+    }
+
+    for (u32 address = start; address < start + len; address += PageSize) {
+        if (IsMapped(address)) {
+            Panic("address 0x%x is already mapped", address);
+        }
+
+        MapPage(address);
+    }
+
+    return 0;
+}
+
+static i32 syscallMunmap(u32 start, u32 len) {
+    if (start % PageSize != 0) {
+        Panic("start address must be page aligned");
+    }
+
+    for (u32 address = start; address < start + len; address += PageSize) {
+        if (!IsMapped(address)) {
+            Panic("address 0x%x is not mapped", address);
+        }
+
+        UnmapPage(address);
+    }
+
+    return 0;
+}
+
 u32 TrapHandler(u32 syscallNum, u32 arg1, u32 arg2, u32 arg3) {
     u32 result = 0;
     switch (syscallNum) {
@@ -99,6 +139,12 @@ u32 TrapHandler(u32 syscallNum, u32 arg1, u32 arg2, u32 arg3) {
             return;
         case SYSCALL_SLEEP:
             syscallSleep(arg1);
+            break;
+        case SYSCALL_MMAP:
+            result = syscallMmap(arg1, arg2, arg3);
+            break;
+        case SYSCALL_MUNMAP:
+            result = syscallMunmap(arg1, arg2);
             break;
         default:
             Panic("Unknown syscall number: %d", syscallNum);

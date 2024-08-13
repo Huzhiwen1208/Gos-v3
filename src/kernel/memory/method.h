@@ -32,3 +32,7 @@ void InitializeMemoryMapping();
 
 void EnablePaging();
 void DisablePaging();
+
+void MapPage(VirtualAddress addr);
+Boolean IsMapped(VirtualAddress addr);
+void UnmapPage(VirtualAddress addr);

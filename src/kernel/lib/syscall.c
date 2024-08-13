@@ -63,17 +63,11 @@ void GetTaskInfo(TaskInfo* info) {
 }
 
 i32 MMap(u32 start, u32 len, u32 prot) {
-    while (1) {
-        for (int i = 0; i < 100000000; i++); // 类似于sleep作用
-        printf("MMap Not implemented yet\n");
-    }
+    SystemCall(SYSCALL_MMAP, start, len, prot);
 }
 
 i32 MUnmap(u32 start, u32 len) {
-    while (1) {
-        for (int i = 0; i < 100000000; i++); // 类似于sleep作用
-        printf("MUnmap Not implemented yet\n");
-    }
+    SystemCall(SYSCALL_MUNMAP, start, len, 0);
 }
 
 void Sleep(u32 time) {

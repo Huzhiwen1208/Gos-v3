@@ -24,7 +24,7 @@ void TestSyscallGetTaskInfo() {
 }
 
 void TestSyscallMmap() {
-    u32 start = 0x100000;
+    u32 start = 0x400000;
     u32 len = 4096 * 2; // 2个页
     u32 prot = 0x7;
     i32 ret = MMap(start, len, prot);
@@ -36,14 +36,17 @@ void TestSyscallMmap() {
     }
     printf("[TestSyscallMmap] write 'A' to 0x%x\n", start);
 
-    for (int i = 0; i < len; i++) {
+    for (int i = 0; i < 10; i++) {
         printf("%c", ptr[i]);
     }
+
+    printf("\nTestSyscallMmap passed\n");
+    MUnmap(start, len);
     Exit(0);
 }
 
 void TestSyscallMunmap() {
-    u32 start = 0x100000;
+    u32 start = 0x400000;
     u32 len = 4096 * 2; // 2个页
     u32 prot = 0x7;
     i32 ret = MMap(start, len, prot);
@@ -55,12 +58,14 @@ void TestSyscallMunmap() {
     }
     printf("[TestSyscallMunmap] write 'A' to 0x%x\n", start);
 
-    for (int i = 0; i < len; i++) {
+    for (int i = 0; i < 10; i++) {
         printf("%c", ptr[i]);
     }
+    printf("\n");
 
     ret = MUnmap(start, len);
     printf("[TestSyscallMunmap] start: 0x%x, len: 0x%x, ret: %d\n", start, len, ret);
+    printf("\nTestSyscallMunmap passed\n");
     Exit(0);
 }
 

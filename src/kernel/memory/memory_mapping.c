@@ -58,6 +58,27 @@ void MapPage(VirtualAddress addr) {
     FlushTLB(addr);
 }
 
+Boolean IsMapped(VirtualAddress addr) {
+    Boolean result = FALSE;
+    DisablePaging();
+    PageTableEntry* pte = findPTE(addr);
+    result = pte != NULL && pte->Present;
+    EnablePaging();
+    return result;
+}
+
+void UnmapPage(VirtualAddress addr) {
+    DisablePaging();
+    PageTableEntry* pte = findPTE(addr);
+    if (pte != NULL) {
+        PhysicalAddress page = GetAddressFromPPN(pte->NextPPN);
+        FreeOnePage(page);
+        pte->Present = 0;
+    }
+    EnablePaging();
+    FlushTLB(addr);
+}
+
 void EnablePaging() {
     asm volatile ("movl %cr0, %eax");
     asm volatile ("orl $0x80000000, %eax");

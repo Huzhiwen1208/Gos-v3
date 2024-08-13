@@ -39,6 +39,8 @@ typedef struct DescriptorTablePointer DescriptorTablePointer;
 #define SYSCALL_READ 999
 #define SYSCALL_TASK_INFO 666
 #define SYSCALL_SLEEP 66
+#define SYSCALL_MMAP 77
+#define SYSCALL_MUNMAP 777
 
 // 时钟中断
 #define ClockCounter0 0x40  // 计数器0
