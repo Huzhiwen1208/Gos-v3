@@ -2,6 +2,7 @@
 #include "lib/mod.h"
 #include "console/mod.h"
 #include "memory/mod.h"
+#include "test/mod.h"
 
 void KernelMain() {
     // 清空屏幕，初始化控制台
@@ -14,5 +15,5 @@ void KernelMain() {
     InitMemoryManager();
 
     // 测试BuddyAllocator
-    testBuddyAllocator();
+    TestKernelFunction();
 }
