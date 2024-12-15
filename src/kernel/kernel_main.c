@@ -14,6 +14,6 @@ void KernelMain() {
     // 初始化内存管理
     InitMemoryManager();
 
-    // 测试BuddyAllocator
+    // 测试内核功能
     TestKernelFunction();
 }
