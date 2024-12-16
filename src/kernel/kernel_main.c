@@ -16,6 +16,8 @@ void KernelMain() {
 
     // 初始化中断异常处理
     InitializeInterrupt();
+    asm volatile("sti");
+    SetInterrupt(0x21); // 打开键盘中断
 
     SyscallTest();
 }
