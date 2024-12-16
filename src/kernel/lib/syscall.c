@@ -12,7 +12,7 @@ void SyscallTest() {
     SystemCall(SYSCALL_TEST, 1, 2, 3);
 }
 
-/* TODO: 你需要实现该系统调用，请参考SyscallTest */
+/* TODO2: 你需要实现该系统调用，请参考SyscallTest */
 void SyscallLab2() {
     Panic("SyscallLab2 is not implemented yet!");
 }
