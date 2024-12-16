@@ -2,6 +2,7 @@
 section .text
 
 ; void SwitchProcess(PCB* current, PCB* next);
+; 从current切换到next进程, 保存current的上下文, 并切换到next的上下文
 global SwitchProcess
 SwitchProcess:
     push ebp
