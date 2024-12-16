@@ -53,13 +53,13 @@ $(NakedKernel): $(ELFKernel)
 	objcopy -O binary $< $@
 # ------ kernel made
 
+# TODO3: 补充 middle.bin 的磁盘写入
 # img made --------
-$(IMG): $(TARGET)/bootloader/boot.bin $(TARGET)/bootloader/middle.bin \
-	 $(TARGET)/bootloader/loader.bin $(NakedKernel) image
+$(IMG): $(TARGET)/bootloader/boot.bin $(TARGET)/bootloader/loader.bin \
+	$(NakedKernel) image
 	dd if=$(word 1, $^) of=$@ bs=512 count=1 conv=notrunc
-	dd if=$(word 2, $^) of=$@ bs=512 count=1 seek=260 conv=notrunc
-	dd if=$(word 3, $^) of=$@ bs=512 count=3 seek=1 conv=notrunc
-	dd if=$(word 4, $^) of=$@ bs=512 count=250 seek=4 conv=notrunc
+	dd if=$(word 2, $^) of=$@ bs=512 count=3 seek=1 conv=notrunc
+	dd if=$(word 3, $^) of=$@ bs=512 count=250 seek=4 conv=notrunc
 
 image:
 ifeq ($(wildcard img),)
