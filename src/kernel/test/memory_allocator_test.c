@@ -2,7 +2,7 @@
 
 /// @brief 测试伙伴分配器
 void testBuddyAllocator() {
-    PrintWithColor(GREEN, ">>>>>>>>>>> Test op_overload_test Start <<<<<<<<<<<\n");
+    PrintWithColor(GREEN, ">>>>>>>>>>> Test BuddyAllocator Start <<<<<<<<<<<\n");
 
     char *p1 = (char *)Malloc(100);
     char *p2 = (char *)Malloc(100);
@@ -32,5 +32,5 @@ void testBuddyAllocator() {
     Free(p3);
     Free(p2);
 
-    PrintWithColor(GREEN, ">>>>>>>>>>> Test op_overload_test PASSED <<<<<<<<<<\n");
+    PrintWithColor(GREEN, ">>>>>>>>>>> Test BuddyAllocator PASSED <<<<<<<<<<\n");
 }

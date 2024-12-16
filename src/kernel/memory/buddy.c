@@ -1,13 +1,17 @@
 #include "mod.h"
 #include "../lib/mod.h"
 
+/// @brief 内核全局 Buddy 内存分配器
 BuddyAllocator globalBuddyAllocator;
 
 static i32 getFreeBlockIndex();
 static void freeBlock(i32 index);
 static void mergeBuddy();
-static BuddyBlock* getBuddyBlock(i32 index);
+static BuddyBlock *getBuddyBlock(i32 index);
 
+/// @brief 内核申请 size 个字节大小的内存
+/// @param size 
+/// @return 
 PhysicalAddress Malloc(Size size) {
     // find first block which size is bigger than needed
     i32 pre = 0;
@@ -22,15 +26,15 @@ PhysicalAddress Malloc(Size size) {
 
     if (p == -1)
         Panic("No enough memory when malloc: size=%d", size);
-    
-    while(getBuddyBlock(p)->BlockSize >= 2*size) {
+
+    while (getBuddyBlock(p)->BlockSize >= 2 * size) {
         // split
         Size splitSize = getBuddyBlock(p)->BlockSize >> 1;
-        
+
         i32 block1Index = getFreeBlockIndex();
         i32 block2Index = getFreeBlockIndex();
-        BuddyBlock* block1 = getBuddyBlock(block1Index);
-        BuddyBlock* block2 = getBuddyBlock(block2Index);
+        BuddyBlock *block1 = getBuddyBlock(block1Index);
+        BuddyBlock *block2 = getBuddyBlock(block2Index);
         block1->BaseAddress = getBuddyBlock(p)->BaseAddress;
         block1->BlockSize = splitSize;
         block1->Next = block2Index;
@@ -46,6 +50,8 @@ PhysicalAddress Malloc(Size size) {
     return getBuddyBlock(p)->BaseAddress;
 }
 
+/// @brief 内核释放内存
+/// @param address 
 void Free(PhysicalAddress address) {
     i32 pre = 0;
     i32 p = getBuddyBlock(0)->Next;
@@ -84,12 +90,13 @@ void globalBuddyAllocatorInit() {
     globalBuddyAllocator.Blocks[1].Next = -1;
 }
 
+/// @brief 初始化 Buddy 内存管理器
 void InitMemoryManager() {
     globalBuddyAllocatorInit();
 }
 
 
-static i32 getFreeBlockIndex() {                                                                                                                                               
+static i32 getFreeBlockIndex() {
     for (i32 i = 0; i < BUDDY_BLOCKS; i++) {
         if (globalBuddyAllocator.Blocks[i].Next == 0) {
             globalBuddyAllocator.Blocks[i].Next = -1;
@@ -111,21 +118,21 @@ static void mergeBuddy() {
     i32 pre = getBuddyBlock(0)->Next;
     i32 p = getBuddyBlock(pre)->Next;
     while (p != -1) {
-        if (getBuddyBlock(p)->IsUsed == FALSE 
+        if (getBuddyBlock(p)->IsUsed == FALSE
             && getBuddyBlock(pre)->IsUsed == FALSE
             && ((getBuddyBlock(pre)->BaseAddress - getBuddyBlock(0)->BaseAddress) % getBuddyBlock(p)->BlockSize == 0)
             && getBuddyBlock(pre)->BlockSize == getBuddyBlock(p)->BlockSize) {
-                // merge
-                getBuddyBlock(pre)->BlockSize <<= 1;
-                getBuddyBlock(pre)->Next = getBuddyBlock(p)->Next;
-                freeBlock(p);
-                p = getBuddyBlock(0)->Next;
+            // merge
+            getBuddyBlock(pre)->BlockSize <<= 1;
+            getBuddyBlock(pre)->Next = getBuddyBlock(p)->Next;
+            freeBlock(p);
+            p = getBuddyBlock(0)->Next;
         }
         pre = p;
         p = getBuddyBlock(p)->Next;
     }
 }
 
-static BuddyBlock* getBuddyBlock(i32 index) {
+static BuddyBlock *getBuddyBlock(i32 index) {
     return &globalBuddyAllocator.Blocks[index];
 }

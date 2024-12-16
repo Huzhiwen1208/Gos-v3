@@ -2,9 +2,10 @@
 #include "../lib/method.h"
 #include "../lib/type.h"
 
+/// @brief 全局物理页帧分配器
 FrameAllocator frameAllocator;
 static void globalFrameAllocatorInit();
-static Boolean isFree(PhysicalPageNumber ppn); 
+static Boolean isFree(PhysicalPageNumber ppn);
 static void setFree(PhysicalPageNumber ppn);
 static void setUsed(PhysicalPageNumber ppn);
 static Boolean isSpecifiedMode(PhysicalPageNumber ppn, MachineMode mode);
@@ -12,6 +13,9 @@ static Boolean isDirty(PhysicalPageNumber ppn);
 static void setDirty(PhysicalPageNumber ppn);
 static void setNotDirty(PhysicalPageNumber ppn);
 
+/// @brief 分配一页物理内存
+/// @param mode: 内核页还是用户页
+/// @return 该物理页的起始地址
 PhysicalAddress AllocateOnePage(MachineMode mode) {
     for (Size i = 256; i < MAX_PAGE_COUNT; i++) {
         if (isFree(i) && isSpecifiedMode(i, mode)) {
@@ -28,6 +32,10 @@ PhysicalAddress AllocateOnePage(MachineMode mode) {
     Panic("No free page when allocate one page: mode=%d", mode);
 }
 
+/// @brief 连续分配 pageCount 页物理内存
+/// @param mode: 内核页还是用户页
+/// @param pageCount 
+/// @return 该连续物理页的起始地址
 PhysicalAddress AllocatePagesContinuously(MachineMode mode, u32 pageCount) {
     if (pageCount == 1) {
         return AllocateOnePage(mode);
@@ -60,6 +68,8 @@ PhysicalAddress AllocatePagesContinuously(MachineMode mode, u32 pageCount) {
     Panic("No free page when allocate pages: mode=%d, pageCount=%d", mode, pageCount);
 }
 
+/// @brief 释放一页物理内存
+/// @param address 
 void FreeOnePage(PhysicalAddress address) {
     Assert(address % PageSize == 0);
 
@@ -71,13 +81,15 @@ void FreeOnePage(PhysicalAddress address) {
     }
 }
 
-void MemoryCheckout(PhysicalAddress* ardCountAddress) {
+/// @brief 内存检测，会产生6个内存区域
+/// @param ardCountAddress 
+void MemoryCheckout(PhysicalAddress *ardCountAddress) {
     // Construct frameAllocator
     globalFrameAllocatorInit();
 
-    Size ardCount = *(Size*)ardCountAddress;
+    Size ardCount = *(Size *)ardCountAddress;
 
-    AddressRangeDescriptor* ardt = (AddressRangeDescriptor*)(ardCountAddress + 1);
+    AddressRangeDescriptor *ardt = (AddressRangeDescriptor *)(ardCountAddress + 1);
     for (Size i = 0; i < ardCount; i++) {
         AddressRangeDescriptor ard = ardt[i];
         if (ard.Type == 1 && ard.BaseAddress >= 0x100000) {
@@ -92,17 +104,27 @@ void MemoryCheckout(PhysicalAddress* ardCountAddress) {
     }
 }
 
+/// @brief 将物理地址按页对齐，并返回向下取整的物理页号
+/// @param address 
+/// @return 
 PhysicalPageNumber GetPPNFromAddressFloor(PhysicalAddress address) {
     return address >> PageSizeBits;
 }
 
+/// @brief 将物理地址按页对齐，并返回向上取整的物理页号
+/// @param address 
+/// @return 
 PhysicalPageNumber GetPPNFromAddressCeil(PhysicalAddress address) {
     return (address + PageSize - 1) >> PageSizeBits;
 }
 
+/// @brief 将物理页号转换为物理地址
+/// @param ppn 
+/// @return 
 PhysicalAddress GetAddressFromPPN(PhysicalPageNumber ppn) {
     return ppn << PageSizeBits;
 }
+
 
 static void globalFrameAllocatorInit() {
     frameAllocator.TotalFreePageCount = 0;
@@ -131,12 +153,12 @@ static void setUsed(PhysicalPageNumber ppn) {
 
 static Boolean isSpecifiedMode(PhysicalPageNumber ppn, MachineMode mode) {
     switch (mode) {
-        case KernelMode:
-            return frameAllocator.Pages[ppn] & 0b00000010;
-        case UserMode:
-            return !(frameAllocator.Pages[ppn] & 0b00000010);
-        default:
-            Panic("Unknown mode: mode=%d", mode);
+    case KernelMode:
+        return frameAllocator.Pages[ppn] & 0b00000010;
+    case UserMode:
+        return !(frameAllocator.Pages[ppn] & 0b00000010);
+    default:
+        Panic("Unknown mode: mode=%d", mode);
     }
 }
 
