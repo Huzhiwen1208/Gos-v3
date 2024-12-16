@@ -7,7 +7,7 @@ static i32 getFreeBlockIndex();                // 获取空闲的固定分区块
 static void freeBlock(i32 index);              // 释放固定分区块
 static StableBlock *getStableBlock(i32 index); // 根据索引获取相应的分区块的指针
 
-// TODO: 补全StableMalloc、StableFree、globalStableAllocatorInit函数
+// TODO2: 补全StableMalloc、StableFree、globalStableAllocatorInit函数
 
 PhysicalAddress StableMalloc(Size size) {
     Panic("StableMalloc is not implemented");

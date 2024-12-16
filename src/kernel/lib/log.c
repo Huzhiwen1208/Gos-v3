@@ -1,6 +1,6 @@
 #include "mod.h"
 
-// TODO: 补全Debug、Trace、Info、Warn、Error函数
+// TODO1: 补全Debug、Trace、Info、Warn、Error函数
 
 void DebugHandle(const char *file, i32 line, const char *fmt, ...) {
     Panic("DebugHandle is not implemented");
