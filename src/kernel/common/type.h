@@ -14,14 +14,14 @@ typedef char i8;
 typedef short i16;
 typedef int i32;
 typedef long long i64;
-typedef char* String;
+typedef char *String;
 typedef unsigned int Size;
 
 typedef unsigned int PhysicalAddress;
 typedef unsigned int PhysicalPageNumber;
 
 // 可变参数列表
-typedef char* va_list;
+typedef char *va_list;
 
 #define StructNotAlign __attribute__((packed));
 
@@ -30,3 +30,6 @@ typedef enum MachineMode {
     KernelMode,
     UserMode
 } MachineMode;
+
+/// @brief 使结构体不按边界对齐方式排布
+#define StructNotAlign __attribute__((packed));
