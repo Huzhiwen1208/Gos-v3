@@ -14,5 +14,5 @@ void SyscallTest() {
 
 /* TODO2: 你需要实现该系统调用，请参考SyscallTest */
 void SyscallLab2() {
-    Panic("SyscallLab2 is not implemented yet!");
+    SystemCall(SYSCALL_LAB2, "hello", 1024, 7788);
 }

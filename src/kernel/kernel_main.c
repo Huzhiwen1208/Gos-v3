@@ -1,8 +1,13 @@
 #include "common/mod.h"
 #include "lib/mod.h"
-#include "console/mod.h"
+#include "console/method.h"
+#include "console/type.h"
 #include "memory/mod.h"
 #include "int/mod.h"
+
+static void clockInterruptHandler(u32 vector) {
+    PrintWithColor(GREEN, "The clock interrupt was trigerred!\n");
+}
 
 void KernelMain() {
     // 清空屏幕，初始化控制台
@@ -21,5 +26,10 @@ void KernelMain() {
     *   2.1 实现新的时钟中断处理，并打开时钟中断、CPU中断，此处可参考文档中的内容
     *   2.2 实现一个系统调用 SyscallLab2
     */
+
+    SetInterruptHandler(0x20, clockInterruptHandler);
+    SetInterrupt(0x20);
+    asm volatile ("sti");
+
     SyscallLab2();
 }

@@ -27,3 +27,4 @@ typedef struct DescriptorTablePointer DescriptorTablePointer;
 
 // 系统调用号
 #define SYSCALL_TEST 0
+#define SYSCALL_LAB2 1
