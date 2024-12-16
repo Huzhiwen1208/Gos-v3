@@ -1,13 +1,14 @@
 #include "mod.h"
 
-extern void* InterruptHandlerEntryTable[INTERRUPT_COUNT];
+extern void *InterruptHandlerEntryTable[INTERRUPT_COUNT];
 static InterruptDescriptor IDT[INTERRUPT_COUNT];
 static DescriptorTablePointer IDTR;
 extern void AllTrapsEntry(); // 汇编入口函数
 
+/// @brief 初始化 IDT 并加载
 void InitializeIDT() {
     for (i32 i = 0; i < EXCEPTION_COUNT + OUTERAL_INTERRUPT_COUNT; i++) {
-        void* handler = InterruptHandlerEntryTable[i];
+        void *handler = InterruptHandlerEntryTable[i];
         IDT[i].OffsetLow = (u32)handler & 0xFFFF;
         IDT[i].Selector = 1 << 3;
         IDT[i].Reserved = 0;

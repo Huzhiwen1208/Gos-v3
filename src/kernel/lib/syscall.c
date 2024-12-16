@@ -1,5 +1,11 @@
 #include "mod.h"
 
+/// @brief 用户态系统调用统一入口
+/// @param syscallNum 
+/// @param arg1 
+/// @param arg2 
+/// @param arg3 
+/// @return 
 static u32 SystemCall(u32 syscallNum, u32 arg1, u32 arg2, u32 arg3) {
     asm volatile ("movl %0, %%eax" : : "m"(syscallNum));
     asm volatile ("movl %0, %%ebx" : : "m"(arg1));
