@@ -1,8 +1,8 @@
 #include "mod.h"
 
 // global variables
-void*  InterruptHandlerList[INTERRUPT_COUNT];
-static HashTable* ExceptionMessage;
+void *InterruptHandlerList[INTERRUPT_COUNT];
+static HashTable *ExceptionMessage;
 
 
 // static methods
@@ -16,6 +16,7 @@ static void initProgrammableInterruptController();
 
 // public methods
 
+/// @brief 初始化中断
 void InitializeInterrupt() {
     initProgrammableInterruptController();
     InitializeIDT();
@@ -23,11 +24,15 @@ void InitializeInterrupt() {
     initDefaultInterruptHandler();
 }
 
-void SetInterruptHandler(u32 vector, void* handler) {
+/// @brief 将 vector 对应的中断处理函数设置到中断向量表中
+/// @param vector 
+/// @param handler 
+void SetInterruptHandler(u32 vector, void *handler) {
     InterruptHandlerList[vector] = handler;
 }
 
-// sti
+/// @brief 打开 vector 对应的中断，仅打开 PIC 通道
+/// @param vector 
 void SetInterrupt(u32 vector) {
     Assert(vector >= EXCEPTION_COUNT && vector < EXCEPTION_COUNT + OUTERAL_INTERRUPT_COUNT);
     vector -= EXCEPTION_COUNT;
@@ -39,6 +44,8 @@ void SetInterrupt(u32 vector) {
     }
 }
 
+/// @brief 通知PIC中断已经处理完成，可以接收下一个中断
+/// @param vector 
 void OuteralInterruptCompleted(u32 vector) {
     if (vector >= 0x28) {
         WriteByte(0xA0, 0x20); // 从片
@@ -46,6 +53,8 @@ void OuteralInterruptCompleted(u32 vector) {
     WriteByte(0x20, 0x20);
 }
 
+/// @brief 获得当前上下文中的中断状态
+/// @return 
 u8 GetInterruptStatus() {
     asm volatile ("pushf");
     asm volatile ("pop %eax");
@@ -53,6 +62,8 @@ u8 GetInterruptStatus() {
     asm volatile ("shr $9, %eax");
 }
 
+/// @brief 恢复中断状态为 status
+/// @param status 
 void RestoreInterruptStatus(u8 status) {
     if (status) {
         asm volatile ("sti");
@@ -75,11 +86,11 @@ static void defaultOuteralInterruptHandler(u32 vector) {
 
 static void initDefaultInterruptHandler() {
     for (i32 i = 0; i < EXCEPTION_COUNT; i++) {
-         InterruptHandlerList[i] = defaultExceptionHandler;
+        InterruptHandlerList[i] = defaultExceptionHandler;
     }
 
     for (i32 i = 0; i < OUTERAL_INTERRUPT_COUNT; i++) {
-         InterruptHandlerList[i + EXCEPTION_COUNT] = defaultOuteralInterruptHandler;
+        InterruptHandlerList[i + EXCEPTION_COUNT] = defaultOuteralInterruptHandler;
     }
 }
 
@@ -113,16 +124,16 @@ static void initProgrammableInterruptController() {
 
 static void initExceptionInfoMap() {
     ExceptionMessage = NewMap("u32", "string");
-    ExceptionMessage->Put(ExceptionMessage, 0,  "Divide Error");
-    ExceptionMessage->Put(ExceptionMessage, 1,  "Debug");
-    ExceptionMessage->Put(ExceptionMessage, 2,  "NMI Interrupt");
-    ExceptionMessage->Put(ExceptionMessage, 3,  "Breakpoint");
-    ExceptionMessage->Put(ExceptionMessage, 4,  "Overflow");
-    ExceptionMessage->Put(ExceptionMessage, 5,  "BOUND Range Exceeded");
-    ExceptionMessage->Put(ExceptionMessage, 6,  "Invalid Opcode");
-    ExceptionMessage->Put(ExceptionMessage, 7,  "Device Not Available");
-    ExceptionMessage->Put(ExceptionMessage, 8,  "Double Fault");
-    ExceptionMessage->Put(ExceptionMessage, 9,  "Coprocessor Segment Overrun");
+    ExceptionMessage->Put(ExceptionMessage, 0, "Divide Error");
+    ExceptionMessage->Put(ExceptionMessage, 1, "Debug");
+    ExceptionMessage->Put(ExceptionMessage, 2, "NMI Interrupt");
+    ExceptionMessage->Put(ExceptionMessage, 3, "Breakpoint");
+    ExceptionMessage->Put(ExceptionMessage, 4, "Overflow");
+    ExceptionMessage->Put(ExceptionMessage, 5, "BOUND Range Exceeded");
+    ExceptionMessage->Put(ExceptionMessage, 6, "Invalid Opcode");
+    ExceptionMessage->Put(ExceptionMessage, 7, "Device Not Available");
+    ExceptionMessage->Put(ExceptionMessage, 8, "Double Fault");
+    ExceptionMessage->Put(ExceptionMessage, 9, "Coprocessor Segment Overrun");
     ExceptionMessage->Put(ExceptionMessage, 10, "Invalid TSS");
     ExceptionMessage->Put(ExceptionMessage, 11, "Segment Not Present");
     ExceptionMessage->Put(ExceptionMessage, 12, "Stack-Segment Fault");

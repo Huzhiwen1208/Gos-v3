@@ -1,14 +1,19 @@
 #include "mod.h"
 
-static char* typeList[] = {"u32", "i32", "i8", "u8", "u16", "i16", "string", "char*", "char *"};
+/// @brief 哈希表中键与值的类型
+static char *typeList[] = { "u32", "i32", "i8", "u8", "u16", "i16", "string", "char*", "char *" };
 
-static u32 hash(char* keyType, void* key);
+static u32 hash(char *keyType, void *key);
 
-static Boolean available(HashTable* map, u32 index);
+static Boolean available(HashTable *map, u32 index);
 
-static Boolean isKeyMatched(HashTable* map, u32 index, void* key);
+static Boolean isKeyMatched(HashTable *map, u32 index, void *key);
 
-static void* Get(HashTable* self, void* key) {
+/// @brief 获取哈希表中键为 key 的值
+/// @param self 
+/// @param key 
+/// @return 
+static void *Get(HashTable *self, void *key) {
     if (!self->Initialized) Panic("Hash map not initialized.");
 
     u32 index = hash(self->KeyType, key);
@@ -23,7 +28,11 @@ static void* Get(HashTable* self, void* key) {
     return NULL;
 }
 
-static void Put(HashTable* self, void* key, void* value) {
+/// @brief 将键值对插入哈希表
+/// @param self 
+/// @param key 
+/// @param value 
+static void Put(HashTable *self, void *key, void *value) {
     if (!self->Initialized) Panic("Hash map not initialized.");
 
     u32 index = hash(self->KeyType, key);
@@ -41,7 +50,10 @@ static void Put(HashTable* self, void* key, void* value) {
     self->Table[index].Available = FALSE;
 }
 
-static void Delete(HashTable* self, void* key) {
+/// @brief 将键为 key 的键值对从哈希表中删除
+/// @param self 
+/// @param key 
+static void Delete(HashTable *self, void *key) {
     if (!self->Initialized) Panic("Hash map not initialized.");
 
     u32 index = hash(self->KeyType, key);
@@ -56,8 +68,12 @@ static void Delete(HashTable* self, void* key) {
     }
 }
 
-HashTable* NewMap(char* keyType, char* valueType) {
-    HashTable* result = (HashTable*)Malloc(sizeof(HashTable));
+/// @brief 创建一个空哈希表
+/// @param keyType 
+/// @param valueType 
+/// @return 
+HashTable *NewMap(char *keyType, char *valueType) {
+    HashTable *result = (HashTable *)Malloc(sizeof(HashTable));
     for (Size i = 0; i < HASH_TABLE_SIZE; i++) {
         result->Table[i].Available = TRUE;
         result->Table[i].key = result->Table[i].value = NULL;
@@ -71,21 +87,23 @@ HashTable* NewMap(char* keyType, char* valueType) {
     return result;
 }
 
-void DeleteMap(HashTable** map) {
+/// @brief Destroy 哈希表
+/// @param map 
+void DeleteMap(HashTable **map) {
     if (!(*map)->Initialized) Panic("Hash map not initialized.");
     Free(*map);
 }
 
-static u32 hash(char* keyType, void* key) {
+static u32 hash(char *keyType, void *key) {
     u32 k = -1;
-    for (Size i = 0; i < sizeof(typeList) / sizeof(char*); i++) {
+    for (Size i = 0; i < sizeof(typeList) / sizeof(char *); i++) {
         if (i <= 5 && StringEqual(keyType, typeList[i])) {
             k = (u32)key;
             break;
         }
 
         if (i > 5 && StringEqual(keyType, typeList[i])) {
-            k = StringASCIITotal((char*)key);
+            k = StringASCIITotal((char *)key);
             break;
         }
     }
@@ -93,20 +111,20 @@ static u32 hash(char* keyType, void* key) {
     return k % HASH_TABLE_SIZE;
 }
 
-static Boolean available(HashTable* map, u32 index) {
+static Boolean available(HashTable *map, u32 index) {
     if (!map->Initialized) Panic("Hash map not initialized.");
     return map->Table[index].Available;
 }
 
-static Boolean isKeyMatched(HashTable* map, u32 index, void* key) {
+static Boolean isKeyMatched(HashTable *map, u32 index, void *key) {
     if (!map->Initialized) Panic("Hash map not initialized.");
-    for (Size i = 0; i < sizeof(typeList) / sizeof(char*); i++) {
+    for (Size i = 0; i < sizeof(typeList) / sizeof(char *); i++) {
         if (i <= 5 && StringEqual(map->KeyType, typeList[i])) {
             return (u32)key == (u32)map->Table[index].key;
         }
 
         if (i > 5 && StringEqual(map->KeyType, typeList[i])) {
-            return StringEqual((char*)key, (char*)map->Table[index].key);
+            return StringEqual((char *)key, (char *)map->Table[index].key);
         }
     }
     Panic("Unknown key type: {%s} in hash function.", map->KeyType);

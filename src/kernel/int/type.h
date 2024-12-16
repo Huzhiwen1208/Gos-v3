@@ -19,6 +19,7 @@ struct InterruptDescriptor {
 typedef struct  InterruptDescriptor InterruptDescriptor;
 
 
+/// @brief 中断描述符表指针，用于加载 IDT
 struct DescriptorTablePointer {
     u16 Limit; // 表界限
     u32 Base;  // 表基址
