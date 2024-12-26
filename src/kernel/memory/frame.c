@@ -1,5 +1,6 @@
 #include "mod.h"
-#include "../lib/mod.h"
+#include "../lib/type.h"
+#include "../lib/method.h"
 
 /// @brief 全局物理页帧分配器
 FrameAllocator frameAllocator;
