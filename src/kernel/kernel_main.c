@@ -26,5 +26,11 @@ void KernelMain() {
     // 初始化进程管理
     InitializeProcessManager();
     CreateKernelProcess(testProcess);
+    // TODO: 1. 找到调度器的BUG，检查 AddProcess 和 fetchProcess 方法
     Schedule();
+    /* TODO: 2. 创建三个进程A、B、C。
+        1. A进程打印“I am A process”后调度执行。
+        2. B进程打印“I am B process”后调度执行。
+        3. C进程打印“I am C process”后调度执行。
+    */
 }
