@@ -1,9 +1,10 @@
 #include "mod.h"
-#include "../lib/mod.h"
+#include "../lib/type.h"
+#include "../lib/method.h"
 
 FrameAllocator frameAllocator;
 static void globalFrameAllocatorInit();
-static Boolean isFree(PhysicalPageNumber ppn); 
+static Boolean isFree(PhysicalPageNumber ppn);
 static void setFree(PhysicalPageNumber ppn);
 static void setUsed(PhysicalPageNumber ppn);
 static Boolean isSpecifiedMode(PhysicalPageNumber ppn, MachineMode mode);
@@ -70,13 +71,13 @@ void FreeOnePage(PhysicalAddress address) {
     }
 }
 
-void MemoryCheckout(PhysicalAddress* ardCountAddress) {
+void MemoryCheckout(PhysicalAddress *ardCountAddress) {
     // Construct frameAllocator
     globalFrameAllocatorInit();
 
-    Size ardCount = *(Size*)ardCountAddress;
+    Size ardCount = *(Size *)ardCountAddress;
 
-    AddressRangeDescriptor* ardt = (AddressRangeDescriptor*)(ardCountAddress + 1);
+    AddressRangeDescriptor *ardt = (AddressRangeDescriptor *)(ardCountAddress + 1);
     for (Size i = 0; i < ardCount; i++) {
         AddressRangeDescriptor ard = ardt[i];
         if (ard.Type == 1 && ard.BaseAddress >= 0x100000) {
@@ -130,12 +131,12 @@ static void setUsed(PhysicalPageNumber ppn) {
 
 static Boolean isSpecifiedMode(PhysicalPageNumber ppn, MachineMode mode) {
     switch (mode) {
-        case KernelMode:
-            return frameAllocator.Pages[ppn] & 0b00000010;
-        case UserMode:
-            return !(frameAllocator.Pages[ppn] & 0b00000010);
-        default:
-            Panic("Unknown mode: mode=%d", mode);
+    case KernelMode:
+        return frameAllocator.Pages[ppn] & 0b00000010;
+    case UserMode:
+        return !(frameAllocator.Pages[ppn] & 0b00000010);
+    default:
+        Panic("Unknown mode: mode=%d", mode);
     }
 }
 
