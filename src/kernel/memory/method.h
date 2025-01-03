@@ -14,7 +14,7 @@ PhysicalAddress GetAddressFromPPN(PhysicalPageNumber ppn);
 void InitMemoryManager();
 
 // Memory Check
-void MemoryCheckout(PhysicalAddress* ardCountAddress);
+void MemoryCheckout(PhysicalAddress *ardCountAddress);
 
 // Buddy
 PhysicalAddress Malloc(Size size);
@@ -29,5 +29,3 @@ void SetRootPageTableAddr(PhysicalAddress addr);
 PhysicalAddress GetRootPageTableAddr();
 void FlushTLB(VirtualAddress addr);
 void InitializeMemoryMapping();
-
-void MapPage(VirtualAddress addr);
