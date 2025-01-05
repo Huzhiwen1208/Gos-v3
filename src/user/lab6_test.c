@@ -30,7 +30,7 @@ void TestSyscallMmap() {
     i32 ret = MMap(start, len, prot);
     printf("[TestSyscallMmap] start: 0x%x, len: 0x%x, prot: 0x%x, ret: %d\n", start, len, prot, ret);
 
-    char* ptr = (char*)start;
+    char *ptr = (char *)start;
     for (int i = 0; i < len; i++) {
         ptr[i] = 'A';
     }
@@ -52,7 +52,7 @@ void TestSyscallMunmap() {
     i32 ret = MMap(start, len, prot);
     printf("[TestSyscallMunmap] start: 0x%x, len: 0x%x, prot: 0x%x, ret: %d\n", start, len, prot, ret);
 
-    char* ptr = (char*)start;
+    char *ptr = (char *)start;
     for (int i = 0; i < len; i++) {
         ptr[i] = 'A';
     }
@@ -76,6 +76,7 @@ void TestSyscallSleep() {
     Sleep(sleep_time);
     time = GetTime();
     printf("[TestSyscallSleep] sleep end at %d ms\n", time);
+    printf("\nTestSyscallSleep passed\n");
     Exit(0);
 }
 
