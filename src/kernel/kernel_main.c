@@ -30,6 +30,8 @@ void KernelMain() {
     InitializeDevice();
     // 初始化磁盘
     InitializeIdeDisk();
+    // 初始化磁盘缓存
+    InitializeDiskCache();
 
     KernelMainTest();
 }

@@ -5,6 +5,7 @@
 
 #define DISK_COUNT_PER_CONTROLLER 2
 #define IDE_CONTROLLER_COUNT 2
+#define NAME_LENGTH 32
 
 #define IdeIobaseMaster 0x1F0  // IDE主控制器的IO基址
 #define IdeIobaseSlave 0x170  // IDE从控制器的IO基址
@@ -44,7 +45,7 @@
 
 typedef struct IdeDisk {
     char Name[NAME_LENGTH]; // 磁盘名称
-    struct IdeController* Controller; // 磁盘所属IDE控制器
+    struct IdeController *Controller; // 磁盘所属IDE控制器
     u32 Selector; // 磁盘的选择器
     Boolean IsMaster; // 是否是主盘
     Size TotalSector; // 该磁盘总扇区数
@@ -53,10 +54,10 @@ typedef struct IdeDisk {
 
 typedef struct IdeController {
     char Name[NAME_LENGTH]; // IDE控制器名称
-    ReentrantLock* rlock; // 可重入互斥锁
+    ReentrantLock *rlock; // 可重入互斥锁
     u32 IoBase; // IO基址
     IdeDisk DiskList[DISK_COUNT_PER_CONTROLLER]; // IDE控制器下的磁盘列表
-    IdeDisk* CurrentDisk; // 当前磁盘
+    IdeDisk *CurrentDisk; // 当前磁盘
     u8 ControlByte; // 控制字节
 } IdeController;
 

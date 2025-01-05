@@ -34,6 +34,7 @@ void TestSyscallExit();             // 系统调用Exit测试
 void TestSyscallWaitPid();          // 系统调用WaitPid测试
 
 void TestReadWriteDisk();           // 读写磁盘测试
+void TestReadWriteDiskWithCache();  // 读写磁盘测试（带缓存）
 
 // 测试套件，主测试方法
 void KernelMainTest() {
@@ -45,12 +46,13 @@ void KernelMainTest() {
     // TestSyscallGetPid();
     // TestSyscallExit();
     // TestSyscallWaitPid();
-    TestReadWriteDisk();
+    // TestReadWriteDisk();
+    TestReadWriteDiskWithCache();
 }
 
 
 // 测试方法具体实现
-void TestKernelProcessWithPaging(){
+void TestKernelProcessWithPaging() {
     CreateKernelProcess(ProcessA);
     CreateKernelProcess(ProcessB);
     CreateKernelProcess(ProcessC);
@@ -95,7 +97,7 @@ void TestSyscallWaitPid() {
 
 void TestReadWriteDisk() {
     // 读写磁盘测试
-    char* buffer = (char*)Malloc(512);
+    char *buffer = (char *)Malloc(512);
     int i;
     for (i = 0; i < 512; i++) {
         buffer[i] = 8;
@@ -110,6 +112,32 @@ void TestReadWriteDisk() {
     }
     if (i == 512) {
         PrintWithColor(GREEN, "Read/Write Disk Success!\n");
+    }
+}
+
+void TestReadWriteDiskWithCache() {
+    // 读写磁盘测试（带缓存）
+    char *buffer = (char *)Malloc(512);
+    int i;
+    for (i = 0; i < 512; i++) {
+        buffer[i] = 8;
+    }
+    DiskCacheWrite(0, buffer);
+    Free(buffer);
+
+    char *buffer2 = (char *)Malloc(512);
+    MemorySet(buffer2, 0, 512);
+    DiskCacheRead(0, buffer2);
+
+    for (i = 0; i < 512; i++) {
+        if (buffer2[i] != 8) {
+            PrintWithColor(RED, "Read/Write Disk With Cache Error!\n");
+            break;
+        }
+    }
+
+    if (i == 512) {
+        PrintWithColor(GREEN, "Read/Write Disk With Cache Success!\n");
     }
 }
 

@@ -1,17 +1,19 @@
 #include "mod.h"
 
-static HashTable* diskCacheMap; // blockID: PhysicalAddress
+static HashTable *diskCacheMap; // blockID: PhysicalAddress
 
 void InitializeDiskCache() {
     diskCacheMap = NewMap("u32", "PhysicalAddress");
 }
 
-void DiskCacheRead(u32 blockID, void* buffer) {
+void DiskCacheRead(u32 blockID, void *buffer) {
     PhysicalAddress addr = (PhysicalAddress)diskCacheMap->Get(diskCacheMap, blockID);
     // cache miss
     if (addr == NULL) {
-        DeviceRead(FS_DEVICE, blockID, 1, buffer);
-        diskCacheMap->Put(diskCacheMap, blockID, buffer); // 更新缓存
+        void *new_buffer = (void *)Malloc(512 * sizeof(char));
+        DeviceRead(FS_DEVICE, blockID, 1, new_buffer);
+        diskCacheMap->Put(diskCacheMap, blockID, new_buffer); // 更新缓存
+        MemoryCopy(buffer, new_buffer, 512);
         return;
     }
 
@@ -20,11 +22,15 @@ void DiskCacheRead(u32 blockID, void* buffer) {
 }
 
 // 全写法
-void DiskCacheWrite(u32 blockID, void* buffer) {
+void DiskCacheWrite(u32 blockID, void *buffer) {
     PhysicalAddress addr = (PhysicalAddress)diskCacheMap->Get(diskCacheMap, blockID);
-    if (addr) {
-        MemoryCopy(addr, buffer, 512);
-        diskCacheMap->Put(diskCacheMap, blockID, buffer);
+    // cache miss
+    if (addr == NULL) {
+        DeviceWrite(FS_DEVICE, blockID, 1, buffer);
+        return;
     }
+
+    // cache hit
+    MemoryCopy(addr, buffer, 512);
     DeviceWrite(FS_DEVICE, blockID, 1, buffer);
 }
