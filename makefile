@@ -83,10 +83,10 @@ ifeq ($(wildcard img),)
 	@mkdir img
 endif
 ifeq ($(wildcard $(IMG)),)
-	bximage -q -hd=16 -mode=create -sectsize=512 -imgmode=flat $(IMG)
+	bximage -q -hd=16 -func=create -sectsize=512 -imgmode=flat $(IMG)
 endif
 ifeq ($(wildcard $(FSIMG)),)
-	bximage -q -hd=128 -mode=create -sectsize=512 -imgmode=flat $(FSIMG)
+	bximage -q -hd=128 -func=create -sectsize=512 -imgmode=flat $(FSIMG)
 endif
 # ------- img made
 
