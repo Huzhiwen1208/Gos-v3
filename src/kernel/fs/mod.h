@@ -5,3 +5,4 @@
 #include "../ds/mod.h"
 #include "../memory/mod.h"
 #include "../disk/mod.h"
+#include "../console/mod.h"

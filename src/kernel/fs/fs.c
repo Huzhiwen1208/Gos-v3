@@ -1,4 +1,5 @@
 #include "mod.h"
+#include "../console/type.h"
 
 /**
  * 我们第一版先不做文件系统的一级间接和二级间接。后面会进行补充 TODO
@@ -11,11 +12,11 @@ static String currentPath = NULL; // 默认为根目录
 
 // static methods declaration
 
-static BitMap* newBitMap(u32 startBlockID, u32 blocks);
-static DiskInode* newEmptyDiskInode();
-static DirectoryEntry* newDirectoryEntry(char* name, InodeID id);
-static void writeDiskInode(InodeID id, DiskInode* diskInode);
-static DiskInode* readDiskInode(InodeID id);
+static BitMap *newBitMap(u32 startBlockID, u32 blocks);
+static DiskInode *newEmptyDiskInode();
+static DirectoryEntry *newDirectoryEntry(char *name, InodeID id);
+static void writeDiskInode(InodeID id, DiskInode *diskInode);
+static DiskInode *readDiskInode(InodeID id);
 static InodeID allocateOneInodeID();
 static void freeOneInodeID(InodeID id);
 /// @brief 申请一个数据块
@@ -46,7 +47,7 @@ Boolean ClearFileContentByInodeID(InodeID id) {
         return FALSE;
     }
 
-    DiskInode* fileInode = readDiskInode(id);
+    DiskInode *fileInode = readDiskInode(id);
     u32 size = fileInode->Size;
     u32 blocks = (size + 511) / 512; // 向上取整
 
@@ -82,7 +83,7 @@ Boolean ReadFileLine(String path, u32 n, String buf) {
         return  TRUE;
     }
 
-    DiskInode* fileInode = readDiskInode(id);
+    DiskInode *fileInode = readDiskInode(id);
     u32 size = fileInode->Size;
     u32 blocks = (size + 511) / 512; // 向上取整
 
@@ -98,7 +99,7 @@ Boolean ReadFileLine(String path, u32 n, String buf) {
             }
 
             if (buffer[j] == '\n') {
-                cnt ++;
+                cnt++;
                 continue;
             }
             if (cnt >= n) {
@@ -126,7 +127,7 @@ Boolean WriteFileContent(String path, String content, Boolean trunc) {
     }
 
     // 写入
-    DiskInode* fileInode = readDiskInode(id);
+    DiskInode *fileInode = readDiskInode(id);
     u32 size = fileInode->Size;
     // 如果是正好写满了x块，那么需要申请一块新的块
     if (size % 512 == 0) {
@@ -162,7 +163,7 @@ Boolean PrintFileContent(String path, u32 n) {
         return  TRUE;
     }
 
-    DiskInode* fileInode = readDiskInode(id);
+    DiskInode *fileInode = readDiskInode(id);
     u32 size = fileInode->Size;
     u32 blocks = (size + 511) / 512; // 向上取整
 
@@ -264,7 +265,7 @@ Boolean ChangeDirectory(String path) {
         return TRUE;
     }
 
-     // ..模式
+    // ..模式
     if (StringStartWith(path, "..")) {
         // 如果是..模式
         if (StringLength(path) == 2 || StringEqual(path, "../")) {
@@ -379,7 +380,7 @@ void ListFiles(String option, String path) {
         return;
     }
 
-    if(StringLength(path) == 0 || StringEqual(path, ".")) {
+    if (StringLength(path) == 0 || StringEqual(path, ".")) {
         path = currentPath;
     }
 
@@ -389,7 +390,7 @@ void ListFiles(String option, String path) {
         if (StringLength(option) > 0) {
             if (StringEqual(option, "-a")) {
                 all = TRUE;
-            }else {
+            } else {
                 Printf("ls: invalid option '%s'\n", option);
                 return;
             }
@@ -441,7 +442,7 @@ void ListFiles(String option, String path) {
         }
 
         // 如果是目录，那么就打印目录下的所有文件名，文件是默认颜色，目录是蓝色
-        DiskInode* dirInode = readDiskInode(id);
+        DiskInode *dirInode = readDiskInode(id);
         u32 size = dirInode->Size;
         u32 blocks = (size + 511) / 512; // 向上取整
         for (u32 i = 0; i < blocks; i++) {
@@ -449,8 +450,8 @@ void ListFiles(String option, String path) {
             u8 buffer[512];
             DiskCacheRead(blockID, buffer);
             for (u32 j = 0; j < 512; j += sizeof(DirectoryEntry)) {
-                DirectoryEntry* entry = (DirectoryEntry*)(buffer + j);
-                if (entry->InodeID == 0) 
+                DirectoryEntry *entry = (DirectoryEntry *)(buffer + j);
+                if (entry->InodeID == 0)
                     break;
                 if (j && entry->InodeID != -1) {
                     Printf("\t");
@@ -458,16 +459,16 @@ void ListFiles(String option, String path) {
                 if (all) {
                     if (isDirectory(entry->InodeID)) {
                         PrintWithColor(LIGHT_BLUE, "%s", entry->Name);
-                    }else {
+                    } else {
                         Printf("%s", entry->Name);
                     }
-                }else {
+                } else {
                     if (StringStartWith(entry->Name, "."))
                         continue;
 
                     if (isDirectory(entry->InodeID)) {
                         PrintWithColor(LIGHT_BLUE, "%s", entry->Name);
-                    }else {
+                    } else {
                         Printf("%s", entry->Name);
                     }
                 }
@@ -484,9 +485,9 @@ void ListFiles(String option, String path) {
     String temp = (String)Malloc(256);
     if (currentDirectoryInodeID == 0) {
         MemoryCopy(temp, currentPath, 1);
-        if (StringStartWith(path, "./")) 
-            MemoryCopy(temp + 1, path + 2, StringLength(path+2) + 1);
-        else 
+        if (StringStartWith(path, "./"))
+            MemoryCopy(temp + 1, path + 2, StringLength(path + 2) + 1);
+        else
             MemoryCopy(temp + 1, path, StringLength(path) + 1);
         ListFiles(option, temp);
 
@@ -499,8 +500,8 @@ void ListFiles(String option, String path) {
     if (temp[len - 1] != '/') {
         temp[len++] = '/';
     }
-    if (StringStartWith(path, "./")) 
-        MemoryCopy(temp + len, path + 2, StringLength(path+2) + 1);
+    if (StringStartWith(path, "./"))
+        MemoryCopy(temp + len, path + 2, StringLength(path + 2) + 1);
     else
         MemoryCopy(temp + len, path, StringLength(path) + 1);
     ListFiles(option, temp);
@@ -520,7 +521,7 @@ Boolean MakeDirectory(String path, String option) {
         if (StringLength(option) > 0) {
             if (StringEqual(option, "-p")) {
                 create = TRUE;
-            }else {
+            } else {
                 Printf("mkdir: invalid option '%s'\n", option);
                 return FALSE;
             }
@@ -585,9 +586,9 @@ Boolean MakeDirectory(String path, String option) {
     String temp = (String)Malloc(256);
     if (currentDirectoryInodeID == 0) {
         MemoryCopy(temp, currentPath, 1);
-        if (StringStartWith(path, "./")) 
-            MemoryCopy(temp + 1, path + 2, StringLength(path+2) + 1);
-        else 
+        if (StringStartWith(path, "./"))
+            MemoryCopy(temp + 1, path + 2, StringLength(path + 2) + 1);
+        else
             MemoryCopy(temp + 1, path, StringLength(path) + 1);
         Boolean result = MakeDirectory(temp, option);
         Free(temp);
@@ -599,8 +600,8 @@ Boolean MakeDirectory(String path, String option) {
     if (temp[len - 1] != '/') {
         temp[len++] = '/';
     }
-    if (StringStartWith(path, "./")) 
-        MemoryCopy(temp + len, path + 2, StringLength(path+2) + 1);
+    if (StringStartWith(path, "./"))
+        MemoryCopy(temp + len, path + 2, StringLength(path + 2) + 1);
     else
         MemoryCopy(temp + len, path, StringLength(path) + 1);
     Boolean result = MakeDirectory(temp, option);
@@ -619,7 +620,7 @@ InodeID CreateFile(InodeID id, String name, FileType type) {
         id = currentDirectoryInodeID;
     }
 
-    DiskInode* dirInode = readDiskInode(id);
+    DiskInode *dirInode = readDiskInode(id);
     if (dirInode->Type != FT_DIRECTORY) {
         Panic("[CreateFile] current directory is not a directory");
     }
@@ -648,13 +649,13 @@ InodeID CreateFile(InodeID id, String name, FileType type) {
     u8 buffer[512];
     DiskCacheRead(blockID, buffer);
     InodeID fileID = allocateOneInodeID();
-    DirectoryEntry* entry = newDirectoryEntry(name, fileID);
+    DirectoryEntry *entry = newDirectoryEntry(name, fileID);
     // append 目录项
-    MemoryCopy(buffer + size%512, entry, sizeof(DirectoryEntry));
+    MemoryCopy(buffer + size % 512, entry, sizeof(DirectoryEntry));
     DiskCacheWrite(blockID, buffer);
 
     // 创建diskInode
-    DiskInode* fileInode = newEmptyDiskInode();
+    DiskInode *fileInode = newEmptyDiskInode();
     fileInode->Type = type;
     fileInode->RefCount = 1;
     writeDiskInode(fileID, fileInode);
@@ -690,7 +691,7 @@ Boolean RemoveFile(String option, String path) {
     if (StringLength(option) > 0) {
         if (StringEqual(option, "-r")) {
             deleteDir = TRUE;
-        }else {
+        } else {
             Printf("rm: invalid option '%s'\n", option);
             return FALSE;
         }
@@ -705,33 +706,33 @@ Boolean RemoveFile(String option, String path) {
         MemoryCopy(preDir, path, StringLength(path) + 1);
 
         u32 len = StringLength(preDir);
-        int i = len - (preDir[len-1] == '/' ? 2: 1);
+        int i = len - (preDir[len - 1] == '/' ? 2 : 1);
         for (; i >= 0; i--) {
             if (preDir[i] == '/')
                 break;
         }
 
-        MemoryCopy(name, preDir + i + 1, len - (preDir[len-1] == '/' ? 2: 1) - i); // 复制最后的文件名
+        MemoryCopy(name, preDir + i + 1, len - (preDir[len - 1] == '/' ? 2 : 1) - i); // 复制最后的文件名
         pathBackStep(preDir);  // preDir 回退到上一级目录
     } else {
         if (StringStartWith(path, "./")) {
-            MemoryCopy(preDir, path+2, StringLength(path+2) + 1);
-        }else {
+            MemoryCopy(preDir, path + 2, StringLength(path + 2) + 1);
+        } else {
             MemoryCopy(preDir, path, StringLength(path) + 1);
         }
 
         if (CharCount(preDir, '/') == 0) {
             MemoryCopy(name, preDir, StringLength(preDir) + 1);
             MemoryCopy(preDir, currentPath, StringLength(currentPath) + 1);
-        }else {
+        } else {
             u32 len = StringLength(preDir);
-            int i = len - (preDir[len-1] == '/' ? 2: 1);
+            int i = len - (preDir[len - 1] == '/' ? 2 : 1);
             for (; i >= 0; i--) {
                 if (preDir[i] == '/')
                     break;
             }
 
-            MemoryCopy(name, preDir + i + 1, len - (preDir[len-1] == '/' ? 2: 1) - i); // 复制最后的文件名
+            MemoryCopy(name, preDir + i + 1, len - (preDir[len - 1] == '/' ? 2 : 1) - i); // 复制最后的文件名
             pathBackStep(preDir);  // preDir 回退到上一级目录
         }
     }
@@ -748,10 +749,10 @@ Boolean RemoveFile(String option, String path) {
 void InitializeFileSystem() {
     easyFileSystem.Device = GetDeviceByID(1);
     easyFileSystem.rlock = NewReentrantLock();
-    u32 totalBlocks = ((IdeDisk*)easyFileSystem.Device->DevicePtr)->TotalSector;
- 
+    u32 totalBlocks = ((IdeDisk *)easyFileSystem.Device->DevicePtr)->TotalSector;
+
     // 1. 创建Inode 的位图，我们取5个块来存储inode位图，这样可以存储5*4096=20K个inode（文件）
-    BitMap* inodeBitMap = newBitMap(1, 5);
+    BitMap *inodeBitMap = newBitMap(1, 5);
     u32 inodeCount = 5 * 512 * 8;
     u32 inodeAreaBlocks = inodeCount / (512 / 128);
 
@@ -759,20 +760,20 @@ void InitializeFileSystem() {
     easyFileSystem.InodeAreaStartBlockID = 5 + 1;
 
     /* 2. 创建数据块的位图，位图块数为a，数据块数为b，那么一定满足方程：
-    *  a + b = remainBlocks 
+    *  a + b = remainBlocks
     *  a * 512 * 8 = b
     * 所以我们推出 => a = remainBlocks / (512 * 8 + 1)
     */
     u32 remainBlocks = totalBlocks - 5 - 1 - inodeAreaBlocks; // 剩余的块数
     u32 dataBitMapBlocks = remainBlocks / (512 * 8 + 1);
-    BitMap* dataBitMap = newBitMap(5 + 1 + inodeAreaBlocks, dataBitMapBlocks);
+    BitMap *dataBitMap = newBitMap(5 + 1 + inodeAreaBlocks, dataBitMapBlocks);
     u32 dataAreaBlocks = remainBlocks - dataBitMapBlocks;
 
     easyFileSystem.DataBitMap = dataBitMap;
     easyFileSystem.DataAreaStartBlockID = 5 + 1 + inodeAreaBlocks + dataBitMapBlocks;
 
     // 3. 创建超级块
-    SuperBlock* superBlock = (SuperBlock*)AllocateOnePage(KernelMode);
+    SuperBlock *superBlock = (SuperBlock *)AllocateOnePage(KernelMode);
     superBlock->DataAreaBlocks = dataAreaBlocks;
     superBlock->DataBitMapBlocks = dataBitMapBlocks;
     superBlock->InodeAreaBlocks = inodeAreaBlocks;
@@ -781,12 +782,12 @@ void InitializeFileSystem() {
     superBlock->Magic = 0x20001208;
 
     // 4. 将超级块写入磁盘
-    DiskCacheWrite(0, (void*)superBlock);
+    DiskCacheWrite(0, (void *)superBlock);
     FreeOnePage(superBlock);
 
     // 5. 创建根目录
     InodeID id = allocateOneInodeID();
-    DiskInode* rootInode = newEmptyDiskInode();
+    DiskInode *rootInode = newEmptyDiskInode();
     rootInode->Type = FT_DIRECTORY;
     rootInode->RefCount = 1;
     writeDiskInode(id, rootInode);
@@ -801,15 +802,15 @@ void InitializeFileSystem() {
 
 // static methods implementation
 
-static BitMap* newBitMap(u32 startBlockID, u32 blocks) {
-    BitMap* bitmap = (BitMap*)Malloc(sizeof(BitMap));
+static BitMap *newBitMap(u32 startBlockID, u32 blocks) {
+    BitMap *bitmap = (BitMap *)Malloc(sizeof(BitMap));
     bitmap->StartBlockID = startBlockID;
     bitmap->Blocks = blocks;
     return bitmap;
 }
 
-static DiskInode* newEmptyDiskInode() {
-    DiskInode* diskInode = (DiskInode*)Malloc(sizeof(DiskInode));
+static DiskInode *newEmptyDiskInode() {
+    DiskInode *diskInode = (DiskInode *)Malloc(sizeof(DiskInode));
     diskInode->Type = FT_UNKNOWN;
     diskInode->Size = 0;
     diskInode->RefCount = 0;
@@ -822,7 +823,7 @@ static DiskInode* newEmptyDiskInode() {
     return diskInode;
 }
 
-static void writeDiskInode(InodeID id, DiskInode* diskInode) {
+static void writeDiskInode(InodeID id, DiskInode *diskInode) {
     u32 blockID = easyFileSystem.InodeAreaStartBlockID + id / (512 / 128);
     u32 offset = (id % (512 / 128)) * 128;
 
@@ -832,20 +833,20 @@ static void writeDiskInode(InodeID id, DiskInode* diskInode) {
     DiskCacheWrite(blockID, buffer);
 }
 
-static DirectoryEntry* newDirectoryEntry(char* name, InodeID id) {
-    DirectoryEntry* entry = (DirectoryEntry*)Malloc(sizeof(DirectoryEntry));
+static DirectoryEntry *newDirectoryEntry(char *name, InodeID id) {
+    DirectoryEntry *entry = (DirectoryEntry *)Malloc(sizeof(DirectoryEntry));
     entry->InodeID = id;
     MemoryCopy(entry->Name, name, StringLength(name));
     return entry;
 }
 
-static DiskInode* readDiskInode(InodeID id) {
+static DiskInode *readDiskInode(InodeID id) {
     u32 blockID = easyFileSystem.InodeAreaStartBlockID + id / (512 / 128);
     u32 offset = (id % (512 / 128)) * 128;
 
     u8 buffer[512];
     DiskCacheRead(blockID, buffer);
-    DiskInode* diskInode = (DiskInode*)Malloc(sizeof(DiskInode));
+    DiskInode *diskInode = (DiskInode *)Malloc(sizeof(DiskInode));
     MemoryCopy(diskInode, buffer + offset, sizeof(DiskInode));
     return diskInode;
 }
@@ -939,7 +940,7 @@ static InodeID findInodeIDByNameFromDirectory(InodeID id, String name) {
         return 0;
     }
 
-    DiskInode* dirInode = readDiskInode(id);
+    DiskInode *dirInode = readDiskInode(id);
     if (dirInode->Type != FT_DIRECTORY) {
         Free(dirInode);
         return 0;
@@ -952,7 +953,7 @@ static InodeID findInodeIDByNameFromDirectory(InodeID id, String name) {
         u8 buffer[512];
         DiskCacheRead(blockID, buffer);
         for (u32 j = 0; j < 512; j += sizeof(DirectoryEntry)) {
-            DirectoryEntry* entry = (DirectoryEntry*)(buffer + j);
+            DirectoryEntry *entry = (DirectoryEntry *)(buffer + j);
             if (StringEqual(entry->Name, name)) {
                 Free(dirInode);
                 return entry->InodeID;
@@ -965,7 +966,7 @@ static InodeID findInodeIDByNameFromDirectory(InodeID id, String name) {
 }
 
 static Boolean removeInodeByNameFromDirectory(InodeID id, String name) {
-    DiskInode* dirInode = readDiskInode(id);
+    DiskInode *dirInode = readDiskInode(id);
     if (dirInode->Type != FT_DIRECTORY) {
         Free(dirInode);
         return FALSE;
@@ -978,7 +979,7 @@ static Boolean removeInodeByNameFromDirectory(InodeID id, String name) {
         u8 buffer[512];
         DiskCacheRead(blockID, buffer);
         for (u32 j = 0; j < 512; j += sizeof(DirectoryEntry)) {
-            DirectoryEntry* entry = (DirectoryEntry*)(buffer + j);
+            DirectoryEntry *entry = (DirectoryEntry *)(buffer + j);
             if (StringEqual(entry->Name, name)) {
                 // 1.清空文件/目录的数据块
                 ClearFileContentByInodeID(entry->InodeID);
@@ -1006,7 +1007,7 @@ static Boolean removeInodeByNameFromDirectory(InodeID id, String name) {
 
 static Boolean isDirectory(InodeID id) {
     Boolean result = FALSE;
-    DiskInode* diskInode = readDiskInode(id);
+    DiskInode *diskInode = readDiskInode(id);
     result = diskInode->Type == FT_DIRECTORY;
 
     Free(diskInode);
@@ -1015,7 +1016,7 @@ static Boolean isDirectory(InodeID id) {
 
 static Boolean isFile(InodeID id) {
     Boolean result = FALSE;
-    DiskInode* diskInode = readDiskInode(id);
+    DiskInode *diskInode = readDiskInode(id);
     result = diskInode->Type == FT_FILE;
 
     Free(diskInode);
@@ -1040,19 +1041,19 @@ static InodeID pathToInodeID(String path) {
         MemoryFree(temp, 256);
         MemoryCopy(temp, currentPath, StringLength(currentPath) + 1);
         pathBackStep(temp);
-        
+
         // 转换为绝对路径
         if (StringLength(path) > 3) {
             if (StringEqual(temp, "/"))
                 MemoryCopy(temp + 1, path + 3, StringLength(path + 3) + 1);
-            else 
+            else
                 MemoryCopy(temp + StringLength(temp), path + 2, StringLength(path + 2) + 1);
         }
     }
 
     if (StringStartWith(path, "/")) {
         MemoryCopy(temp, path, StringLength(path) + 1);
-    }else {
+    } else {
         // 只剩下相对路径
         if (StringStartWith(path, ".")) {
             if (StringLength(path) <= 2) {
@@ -1062,7 +1063,7 @@ static InodeID pathToInodeID(String path) {
             MemoryCopy(temp, currentPath, StringLength(currentPath) + 1);
             if (StringEqual(temp, "/"))
                 MemoryCopy(temp + 1, path + 2, StringLength(path + 2) + 1);
-            else 
+            else
                 MemoryCopy(temp + StringLength(temp), path + 1, StringLength(path + 1) + 1);
         } else {
             MemoryCopy(temp, currentPath, StringLength(currentPath) + 1);
@@ -1128,7 +1129,7 @@ static void pathBackStep(String path) {
     }
 
     u32 len = StringLength(path);
-    for (u32 i = len - path[len-1] == '/' ? 2 : 1; i >= 0; i--) {
+    for (u32 i = len - path[len - 1] == '/' ? 2 : 1; i >= 0; i--) {
         if (path[i] == '/') {
             path[i] = '\0';
             break;
