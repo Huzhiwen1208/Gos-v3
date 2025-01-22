@@ -1,8 +1,8 @@
 [org 0x7c00] ; 加载到内存的0x7c00，声明，不是要求
 
-mov edi, 0x1000 ; 加载到内存0x500中
+mov edi, 0x1000 ; 加载到内存0x1000中
 mov ecx, 260 ; 从第260块开始加载
-mov bl, 1 ; 加载三块
+mov bl, 1 ; 加载一块
 call read_disk
 
 jmp 0:0x1000
