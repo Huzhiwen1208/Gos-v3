@@ -1,4 +1,5 @@
 #include "mod.h"
+#include "../lib/method.h"
 
 extern void RestoreContext();
 
@@ -7,8 +8,8 @@ static void restore();
 static void copyPageTableRecursion(u32 childRootPPN, u32 parentRootPPN);
 
 
-void CreateKernelProcess(void* entry) {
-    PCB* process = (PCB*)Malloc(sizeof(PCB));
+void CreateKernelProcess(void *entry) {
+    PCB *process = (PCB *)Malloc(sizeof(PCB));
     process->ID = AllocatePID();
     process->Status = PROCESS_STATE_RUNNABLE;
     u32 stack = AllocateOnePage(KernelMode) + PageSize;
@@ -23,19 +24,19 @@ void CreateKernelProcess(void* entry) {
     );
 
     stack -= sizeof(SwitchContext);
-    SwitchContext* context = (SwitchContext*)stack;
+    SwitchContext *context = (SwitchContext *)stack;
     context->EIP = (u32)entry;
     context->EBP = 0;
     context->ESI = 0;
     context->EDI = 0;
     context->EBX = 0;
-    process->KernelStackPointer = (PhysicalAddress*)stack;
+    process->KernelStackPointer = (PhysicalAddress *)stack;
 
     AddProcess(process);
 }
 
-void CreateUserProcess(void* entry) {
-    PCB* process = (PCB*)Malloc(sizeof(PCB));
+void CreateUserProcess(void *entry) {
+    PCB *process = (PCB *)Malloc(sizeof(PCB));
     process->ID = AllocatePID();
     process->Status = PROCESS_STATE_RUNNABLE;
     u32 stack = AllocateOnePage(KernelMode) + PageSize;
@@ -50,7 +51,7 @@ void CreateUserProcess(void* entry) {
     );
 
     stack -= sizeof(InterruptContext);
-    InterruptContext* trapContext = (InterruptContext*)stack;
+    InterruptContext *trapContext = (InterruptContext *)stack;
     trapContext->Vector = 0x80;
     trapContext->ErrCode = 0x88888888;
     trapContext->EDI = 0;
@@ -72,22 +73,22 @@ void CreateUserProcess(void* entry) {
     trapContext->ESP3 = UserStackTop;
 
     stack -= sizeof(SwitchContext);
-    SwitchContext* context = (SwitchContext*)stack;
+    SwitchContext *context = (SwitchContext *)stack;
     context->EIP = restore;
     context->EBP = 0;
     context->ESI = 0;
     context->EDI = 0;
     context->EBX = 0;
-    process->KernelStackPointer = (PhysicalAddress*)stack;
+    process->KernelStackPointer = (PhysicalAddress *)stack;
 
     AddProcess(process);
 }
 
 PID ForkProcess() {
-    PCB* parent = GetCurrentProcess();
+    PCB *parent = GetCurrentProcess();
     Assert(parent->Type == PROCESS_TYPE_USER);
-    
-    PCB* child = (PCB*)Malloc(sizeof(PCB));
+
+    PCB *child = (PCB *)Malloc(sizeof(PCB));
     child->ID = AllocatePID();
     child->ParentID = parent->ID;
     child->Status = parent->Status;
@@ -102,15 +103,15 @@ PID ForkProcess() {
     child->RootPPN = childRootPPN;
 
     stack -= sizeof(InterruptContext);
-    InterruptContext* ctx = (InterruptContext*)stack;
+    InterruptContext *ctx = (InterruptContext *)stack;
     ctx->EAX = 0; // 子进程应该返回0
 
     stack -= sizeof(SwitchContext);
-    SwitchContext* sctx = (SwitchContext*)stack;
+    SwitchContext *sctx = (SwitchContext *)stack;
     sctx->EIP = restore;
     sctx->EBP = sctx->ESI = sctx->EDI = sctx->EBX = 0;
 
-    child->KernelStackPointer = (PhysicalAddress*)stack;
+    child->KernelStackPointer = (PhysicalAddress *)stack;
 
     AddProcess(child);
     Schedule();
@@ -118,7 +119,7 @@ PID ForkProcess() {
 }
 
 static void restore() {
-    PCB* current = GetCurrentProcess();
+    PCB *current = GetCurrentProcess();
     u32 stack = ((u32)current->KernelStackPointer + PageSize - 1) / PageSize * PageSize;
     stack -= sizeof(InterruptContext);
     asm volatile ("movl %0, %%esp" : : "m"(stack));
@@ -135,8 +136,8 @@ static void copyPageTableRecursion(u32 childRootPPN, u32 parentRootPPN) {
 
     // 2. 复制第二级页表
     DisablePaging();
-    PageTableEntry* childPTE = (PageTableEntry*)GetAddressFromPPN(childRootPPN);
-    PageTableEntry* parentPTE = (PageTableEntry*)GetAddressFromPPN(parentRootPPN);
+    PageTableEntry *childPTE = (PageTableEntry *)GetAddressFromPPN(childRootPPN);
+    PageTableEntry *parentPTE = (PageTableEntry *)GetAddressFromPPN(parentRootPPN);
     for (Size i = 1; i < 1024; i++) {
         if (parentPTE[i].Present == 0) continue;
 
@@ -150,8 +151,8 @@ static void copyPageTableRecursion(u32 childRootPPN, u32 parentRootPPN) {
         );
 
         // 3. 复制页帧，数据页
-        PageTableEntry* secondChildPTE = (PageTableEntry*)GetAddressFromPPN(childPPN);
-        PageTableEntry* secondParentPTE = (PageTableEntry*)GetAddressFromPPN(parentPPN);
+        PageTableEntry *secondChildPTE = (PageTableEntry *)GetAddressFromPPN(childPPN);
+        PageTableEntry *secondParentPTE = (PageTableEntry *)GetAddressFromPPN(parentPPN);
         for (Size j = 0; j < 1024; j++) {
             if (secondParentPTE[j].Present == 0) continue;
 

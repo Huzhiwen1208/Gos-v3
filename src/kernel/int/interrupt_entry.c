@@ -1,8 +1,9 @@
 #include "mod.h"
+#include "../lib/method.h"
 
 // global variables
-void*  InterruptHandlerList[INTERRUPT_COUNT];
-static HashTable* ExceptionMessage;
+void *InterruptHandlerList[INTERRUPT_COUNT];
+static HashTable *ExceptionMessage;
 
 
 // static methods
@@ -23,7 +24,7 @@ void InitializeInterrupt() {
     initDefaultInterruptHandler();
 }
 
-void SetInterruptHandler(u32 vector, void* handler) {
+void SetInterruptHandler(u32 vector, void *handler) {
     InterruptHandlerList[vector] = handler;
 }
 
@@ -75,11 +76,11 @@ static void defaultOuteralInterruptHandler(u32 vector) {
 
 static void initDefaultInterruptHandler() {
     for (i32 i = 0; i < EXCEPTION_COUNT; i++) {
-         InterruptHandlerList[i] = defaultExceptionHandler;
+        InterruptHandlerList[i] = defaultExceptionHandler;
     }
 
     for (i32 i = 0; i < OUTERAL_INTERRUPT_COUNT; i++) {
-         InterruptHandlerList[i + EXCEPTION_COUNT] = defaultOuteralInterruptHandler;
+        InterruptHandlerList[i + EXCEPTION_COUNT] = defaultOuteralInterruptHandler;
     }
 }
 
@@ -113,16 +114,16 @@ static void initProgrammableInterruptController() {
 
 static void initExceptionInfoMap() {
     ExceptionMessage = NewMap("u32", "string");
-    ExceptionMessage->Put(ExceptionMessage, 0,  "Divide Error");
-    ExceptionMessage->Put(ExceptionMessage, 1,  "Debug");
-    ExceptionMessage->Put(ExceptionMessage, 2,  "NMI Interrupt");
-    ExceptionMessage->Put(ExceptionMessage, 3,  "Breakpoint");
-    ExceptionMessage->Put(ExceptionMessage, 4,  "Overflow");
-    ExceptionMessage->Put(ExceptionMessage, 5,  "BOUND Range Exceeded");
-    ExceptionMessage->Put(ExceptionMessage, 6,  "Invalid Opcode");
-    ExceptionMessage->Put(ExceptionMessage, 7,  "Device Not Available");
-    ExceptionMessage->Put(ExceptionMessage, 8,  "Double Fault");
-    ExceptionMessage->Put(ExceptionMessage, 9,  "Coprocessor Segment Overrun");
+    ExceptionMessage->Put(ExceptionMessage, 0, "Divide Error");
+    ExceptionMessage->Put(ExceptionMessage, 1, "Debug");
+    ExceptionMessage->Put(ExceptionMessage, 2, "NMI Interrupt");
+    ExceptionMessage->Put(ExceptionMessage, 3, "Breakpoint");
+    ExceptionMessage->Put(ExceptionMessage, 4, "Overflow");
+    ExceptionMessage->Put(ExceptionMessage, 5, "BOUND Range Exceeded");
+    ExceptionMessage->Put(ExceptionMessage, 6, "Invalid Opcode");
+    ExceptionMessage->Put(ExceptionMessage, 7, "Device Not Available");
+    ExceptionMessage->Put(ExceptionMessage, 8, "Double Fault");
+    ExceptionMessage->Put(ExceptionMessage, 9, "Coprocessor Segment Overrun");
     ExceptionMessage->Put(ExceptionMessage, 10, "Invalid TSS");
     ExceptionMessage->Put(ExceptionMessage, 11, "Segment Not Present");
     ExceptionMessage->Put(ExceptionMessage, 12, "Stack-Segment Fault");
