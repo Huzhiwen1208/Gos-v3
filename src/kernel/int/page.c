@@ -1,4 +1,5 @@
 #include "mod.h"
+#include "../lib/method.h"
 
 static VirtualAddress getPageFaultAddress() {
     asm volatile ("movl %cr2, %eax");
