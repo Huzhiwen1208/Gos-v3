@@ -16,7 +16,7 @@ typedef enum ProcessType {
 } ProcessType;
 
 typedef struct PCB {
-    PhysicalAddress* KernelStackPointer;
+    PhysicalAddress *KernelStackPointer;
     PID ID;
     PID ParentID;
     ProcessState Status;
@@ -26,7 +26,7 @@ typedef struct PCB {
 
     u32 CreateTime; // 创建时间ms
     u32 SyscallTimes[MAX_SYSCALL_NUM];  // 系统调用次数记录
-    u32 WackupTime; // 进程Sleep后的醒来时间
+    u32 WakeTime; // 进程Sleep后的醒来时间
 } PCB;
 
 // PID allocator
@@ -37,13 +37,13 @@ typedef struct PIDAllocator {
 
 // Process Manager
 typedef struct ProcessManager {
-    PCB* Current;
-    PCB* RunnableProcesses[MAX_PROCESS_COUNT];
+    PCB *Current;
+    PCB *RunnableProcesses[MAX_PROCESS_COUNT];
     u32 Front;
     u32 Rear;
 
-    PCB* ZombieProcesses[MAX_PROCESS_COUNT];
-    PCB* SleepProcesses[MAX_PROCESS_COUNT];
+    PCB *ZombieProcesses[MAX_PROCESS_COUNT];
+    PCB *SleepProcesses[MAX_PROCESS_COUNT];
 } ProcessManager;
 
 // Process Need

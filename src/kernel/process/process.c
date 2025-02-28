@@ -3,9 +3,9 @@
 static ProcessManager processManager;
 static PIDAllocator pidAllocator;
 
-static PCB* fetchProcess();
+static PCB *fetchProcess();
 static void runFirstProcess();
-static PCB* idleProcess;
+static PCB *idleProcess;
 static void idle();
 static Boolean isEmpty();
 
@@ -14,8 +14,8 @@ static Boolean isEmpty();
 void InitializeProcessManager() {
     processManager.Current = NULL;
     for (int i = 0; i < MAX_PROCESS_COUNT; i++) {
-        processManager.RunnableProcesses[i] = 
-            processManager.ZombieProcesses[i] = 
+        processManager.RunnableProcesses[i] =
+            processManager.ZombieProcesses[i] =
             processManager.SleepProcesses[i] = NULL;
     }
     processManager.Front = processManager.Rear = 0;
@@ -38,13 +38,13 @@ void FreePID(PID pid) {
     pidAllocator.Bitmap[pid / 32] &= ~(1 << (pid % 32));
 }
 
-PCB* GetCurrentProcess() {
+PCB *GetCurrentProcess() {
     return processManager.Current;
 }
 
 /// @brief 入队，进入就绪队列
 /// @param process 
-void AddProcess(PCB* process) {
+void AddProcess(PCB *process) {
     if ((processManager.Rear + 1) % MAX_PROCESS_COUNT == processManager.Front) {
         Panic("Queue is full");
     }
@@ -53,7 +53,7 @@ void AddProcess(PCB* process) {
     processManager.Rear = (processManager.Rear + 1) % MAX_PROCESS_COUNT;
 }
 
-void AddProcessToZombie(PCB* process) {
+void AddProcessToZombie(PCB *process) {
     for (i32 i = 0; i < MAX_PROCESS_COUNT; i++) {
         if (processManager.ZombieProcesses[i] == NULL) {
             processManager.ZombieProcesses[i] = process;
@@ -64,13 +64,13 @@ void AddProcessToZombie(PCB* process) {
     Panic("The zombie process queue is full");
 }
 
-void SleepProcess(PCB* process) {
+void SleepProcess(PCB *process) {
     process->Status = PROCESS_STATE_BLOCKED;
     Schedule();
 }
 
-void AddProcessToSleep(PCB* process) {
-     for (i32 i = 0; i < MAX_PROCESS_COUNT; i++) {
+void AddProcessToSleep(PCB *process) {
+    for (i32 i = 0; i < MAX_PROCESS_COUNT; i++) {
         if (processManager.SleepProcesses[i] == NULL) {
             processManager.SleepProcesses[i] = process;
             return;
@@ -83,8 +83,8 @@ void AddProcessToSleep(PCB* process) {
 void WackupSleepProcesses() {
     int current_time = GetTimeMS();
     for (int i = 0; i < MAX_PROCESS_COUNT; i++) {
-        PCB* process = processManager.SleepProcesses[i];
-        if (process && process->WackupTime <= current_time) {
+        PCB *process = processManager.SleepProcesses[i];
+        if (process && process->WakeTime <= current_time) {
             AddProcess(process);
             processManager.SleepProcesses[i] = NULL;
         }
@@ -102,9 +102,9 @@ void Schedule() {
         runFirstProcess();
         return;
     }
-    
+
     // 如果就绪队列里有进程，并且当前进程存在，说明可以执行切换
-    PCB* current = processManager.Current;
+    PCB *current = processManager.Current;
     if (current->ID && current->Status != PROCESS_STATE_BLOCKED && current->Status != PROCESS_STATE_ZOMBIE) {
         current->Status = PROCESS_STATE_RUNNABLE;
         AddProcess(current);
@@ -118,7 +118,7 @@ void Schedule() {
         AddProcessToSleep(current);
     }
 
-    PCB* next = fetchProcess();
+    PCB *next = fetchProcess();
     // 下一个进程为用户进程时，需要设置TSS的ESP0为内核栈栈顶，ceil(按页对齐)
     if (next->Type == PROCESS_TYPE_USER) {
         SetTSSEsp0(((u32)next->KernelStackPointer + PageSize - 1) / PageSize * PageSize);
@@ -135,26 +135,26 @@ void Schedule() {
 
 // 将当前进程的所有子进程的父进程设置为当前进程的父进程（包括Ready、Zombie）
 void RedirectParentOfChildren() {
-    PCB* current = processManager.Current;
-    for (i32 i = processManager.Front ; i < processManager.Rear; i = (i + 1) % MAX_PROCESS_COUNT) {
-        PCB* process = (PCB*)processManager.RunnableProcesses[i];
+    PCB *current = processManager.Current;
+    for (i32 i = processManager.Front; i < processManager.Rear; i = (i + 1) % MAX_PROCESS_COUNT) {
+        PCB *process = (PCB *)processManager.RunnableProcesses[i];
         if (process && process->ParentID == current->ID) {
             process->ParentID = current->ParentID;
         }
     }
 
-    for (i32 i = 0 ; i < MAX_PROCESS_COUNT; i++) {
-        PCB* process = (PCB*)processManager.ZombieProcesses[i];
+    for (i32 i = 0; i < MAX_PROCESS_COUNT; i++) {
+        PCB *process = (PCB *)processManager.ZombieProcesses[i];
         if (process && process->ParentID == current->ID) {
             process->ParentID = current->ParentID;
         }
     }
 }
 
-PCB* FindActivatedChildProcessByPID(PID pid) {
-    PCB* current = processManager.Current;
+PCB *FindActivatedChildProcessByPID(PID pid) {
+    PCB *current = processManager.Current;
     for (i32 i = processManager.Front; i < processManager.Rear; i = (i + 1) % MAX_PROCESS_COUNT) {
-        PCB* process = (PCB*)processManager.RunnableProcesses[i];
+        PCB *process = (PCB *)processManager.RunnableProcesses[i];
         if (process && process->ParentID == current->ID && (process->ID == pid || pid == -1)) {
             return process;
         }
@@ -162,10 +162,10 @@ PCB* FindActivatedChildProcessByPID(PID pid) {
     return NULL;
 }
 
-PCB* TakeZombieProcess(PID pid) {
-    PCB* current = processManager.Current;
+PCB *TakeZombieProcess(PID pid) {
+    PCB *current = processManager.Current;
     for (i32 i = 0; i < MAX_PROCESS_COUNT; i++) {
-        PCB* process = (PCB*)processManager.ZombieProcesses[i];
+        PCB *process = (PCB *)processManager.ZombieProcesses[i];
         if (process && process->ParentID == current->ID && (process->ID == pid || pid == -1)) {
             processManager.ZombieProcesses[i] = NULL;
             return process;
@@ -179,7 +179,7 @@ PCB* TakeZombieProcess(PID pid) {
 // static methods implement
 
 static void runFirstProcess() {
-    PCB* next = fetchProcess();
+    PCB *next = fetchProcess();
     // 下一个进程为用户进程时，需要设置TSS的ESP0为内核栈栈顶，ceil(按页对齐)
     if (next->Type == PROCESS_TYPE_USER) {
         SetTSSEsp0(((u32)next->KernelStackPointer + PageSize - 1) / PageSize * PageSize);
@@ -189,19 +189,19 @@ static void runFirstProcess() {
     next->Status = PROCESS_STATE_RUNNING;
 
     PCB unused;
-    PCB* unusedPtr = &unused;
+    PCB *unusedPtr = &unused;
     processManager.Current = next;
     SwitchProcess(unusedPtr, next);
 }
 
-static PCB* fetchProcess() {
+static PCB *fetchProcess() {
     if (isEmpty()) {
         Panic("Queue is empty");
     }
 
-    PCB* result = processManager.RunnableProcesses[processManager.Front];
+    PCB *result = processManager.RunnableProcesses[processManager.Front];
     processManager.RunnableProcesses[processManager.Front] = NULL;
-    processManager.Front = (processManager.Front + 1 ) % MAX_PROCESS_COUNT;
+    processManager.Front = (processManager.Front + 1) % MAX_PROCESS_COUNT;
 
     return result;
 }

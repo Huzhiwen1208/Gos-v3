@@ -32,7 +32,7 @@ static void syscallExit(i32 exitCode) {
     ExitProcess(exitCode);
 }
 
-static PID syscallWaitPid(PID pid, i32* exitCode) {
+static PID syscallWaitPid(PID pid, i32 *exitCode) {
     return WaitProcess(pid, exitCode);
 }
 
@@ -40,8 +40,8 @@ static PID syscallGetPPID() {
     return GetCurrentProcess()->ParentID;
 }
 
-static void syscallTaskInfo(TaskInfo* info) {
-    PCB* current = GetCurrentProcess();
+static void syscallTaskInfo(TaskInfo *info) {
+    PCB *current = GetCurrentProcess();
     info->pid = current->ID;
     info->status = current->Status;
 
@@ -57,7 +57,7 @@ static void syscallTaskInfo(TaskInfo* info) {
 }
 
 static void syscallSleep(u32 sleepTime) {
-    GetCurrentProcess()->WackupTime = GetTimeMS() + sleepTime;
+    GetCurrentProcess()->WakeTime = GetTimeMS() + sleepTime;
     SleepProcess(GetCurrentProcess());
 }
 
@@ -66,7 +66,7 @@ static i32 syscallMmap(u32 start, u32 len, u32 prot) {
         Panic("start address must be page aligned");
     }
 
-    if (prot &!0x7 != 0) {
+    if (prot & !0x7 != 0) {
         Panic("invalid prot flags");
     }
 
@@ -104,53 +104,53 @@ static i32 syscallMunmap(u32 start, u32 len) {
 u32 TrapHandler(u32 syscallNum, u32 arg1, u32 arg2, u32 arg3) {
     u32 result = 0;
     switch (syscallNum) {
-        case SYSCALL_TEST:
-            syscallTest(arg1, arg2, arg3);
-            break;
-        case SYSCALL_WRITE:
-            syscallWrite((String)arg1, (Size)arg2);
-            break;
-        case SYSCALL_FORK:
-            result = syscallFork();
-            break;
-        case SYSCALL_YIELD:
-            syscallYield();
-            break;
-        case SYSCALL_READ:
-            result = syscallRead(arg1, arg2);
-            break;
-        case SYSCALL_GET_PID:
-            result = syscallGetPid();
-            break;
-        case SYSCALL_GET_TIME:
-            result = syscallGetTime();
-            break;
-        case SYSCALL_EXIT:
-            syscallExit(arg1);
-            break;
-        case SYSCALL_WAIT_PID:
-            result = syscallWaitPid(arg1, arg2);
-            break;
-        case SYSCALL_GET_PPID:
-            result = syscallGetPPID();
-            break;
-        case SYSCALL_TASK_INFO:
-            syscallTaskInfo((TaskInfo*)arg1);
-            return;
-        case SYSCALL_SLEEP:
-            syscallSleep(arg1);
-            break;
-        case SYSCALL_MMAP:
-            result = syscallMmap(arg1, arg2, arg3);
-            break;
-        case SYSCALL_MUNMAP:
-            result = syscallMunmap(arg1, arg2);
-            break;
-        default:
-            Panic("Unknown syscall number: %d", syscallNum);
+    case SYSCALL_TEST:
+        syscallTest(arg1, arg2, arg3);
+        break;
+    case SYSCALL_WRITE:
+        syscallWrite((String)arg1, (Size)arg2);
+        break;
+    case SYSCALL_FORK:
+        result = syscallFork();
+        break;
+    case SYSCALL_YIELD:
+        syscallYield();
+        break;
+    case SYSCALL_READ:
+        result = syscallRead(arg1, arg2);
+        break;
+    case SYSCALL_GET_PID:
+        result = syscallGetPid();
+        break;
+    case SYSCALL_GET_TIME:
+        result = syscallGetTime();
+        break;
+    case SYSCALL_EXIT:
+        syscallExit(arg1);
+        break;
+    case SYSCALL_WAIT_PID:
+        result = syscallWaitPid(arg1, arg2);
+        break;
+    case SYSCALL_GET_PPID:
+        result = syscallGetPPID();
+        break;
+    case SYSCALL_TASK_INFO:
+        syscallTaskInfo((TaskInfo *)arg1);
+        return;
+    case SYSCALL_SLEEP:
+        syscallSleep(arg1);
+        break;
+    case SYSCALL_MMAP:
+        result = syscallMmap(arg1, arg2, arg3);
+        break;
+    case SYSCALL_MUNMAP:
+        result = syscallMunmap(arg1, arg2);
+        break;
+    default:
+        Panic("Unknown syscall number: %d", syscallNum);
     }
 
-    PCB* current = GetCurrentProcess();
+    PCB *current = GetCurrentProcess();
     current->SyscallTimes[syscallNum]++;
     return result;
 }
