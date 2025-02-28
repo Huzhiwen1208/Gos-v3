@@ -132,5 +132,4 @@ void TestLab6() {
     CreateUserProcess(TestSyscallMunmap);
     CreateUserProcess(TestSyscallSleep);
     CreateUserProcess(idle_user_task);
-    // Schedule();
 }
