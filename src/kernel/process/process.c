@@ -80,7 +80,7 @@ void AddProcessToSleep(PCB *process) {
     Panic("The sleep process queue is full");
 }
 
-void WackupSleepProcesses() {
+void WakeupSleepProcesses() {
     int current_time = GetTimeMS();
     for (int i = 0; i < MAX_PROCESS_COUNT; i++) {
         PCB *process = processManager.SleepProcesses[i];

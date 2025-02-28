@@ -33,7 +33,7 @@ static void clockInterruptHandler(u32 vector) {
     OuteralInterruptCompleted(vector);
 
     // 唤醒睡着的
-    WackupSleepProcesses();
+    WakeupSleepProcesses();
 
     Schedule();
 }

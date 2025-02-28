@@ -58,7 +58,7 @@ void KernelMainTest() {
 
 
 // 测试方法具体实现
-void TestKernelProcessWithPaging(){
+void TestKernelProcessWithPaging() {
     CreateKernelProcess(ProcessA);
     CreateKernelProcess(ProcessB);
     CreateKernelProcess(ProcessC);
@@ -132,5 +132,5 @@ void TestLab6() {
     CreateUserProcess(TestSyscallMunmap);
     CreateUserProcess(TestSyscallSleep);
     CreateUserProcess(idle_user_task);
-    Schedule();
+    // Schedule();
 }

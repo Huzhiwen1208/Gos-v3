@@ -3,20 +3,20 @@
 void InitializeProcessManager();
 PID AllocatePID();
 void FreePID(PID pid);
-PCB* GetCurrentProcess();
-void AddProcess(PCB* process);
+PCB *GetCurrentProcess();
+void AddProcess(PCB *process);
 void Schedule();
 
-void CreateKernelProcess(void* entry);
-void CreateUserProcess(void* entry);
+void CreateKernelProcess(void *entry);
+void CreateUserProcess(void *entry);
 
 PID ForkProcess();
 
 void RedirectParentOfChildren();
-PCB* FindActivatedChildProcessByPID(PID pid);
-PCB* TakeZombieProcess(PID pid);
+PCB *FindActivatedChildProcessByPID(PID pid);
+PCB *TakeZombieProcess(PID pid);
 void ExitProcess(i32 exitCode);
-PID WaitProcess(PID pid, i32* exitCode);
+PID WaitProcess(PID pid, i32 *exitCode);
 
-void AddProcessToSleep(PCB* process);
-void WackupSleepProcesses();
+void AddProcessToSleep(PCB *process);
+void WakeupSleepProcesses();
