@@ -4,5 +4,5 @@
 
 void KernelMain() {
     String message = "Hello kernel output";
-    ConsoleWriteWithColor(message, StringLength(message), BLUE);
+    ConsoleWriteWithColor(message, StringLength(message), RED);
 }
