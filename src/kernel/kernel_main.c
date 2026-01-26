@@ -17,16 +17,13 @@ void KernelMain() {
     testBuddyAllocator();
 
     // 实验1内容如下，在完成实验1后，修改done的值为True
-    Boolean done = FALSE;
-    if (done) {
-        // 1. 测试日志信息
-        Debug("This is Debug");
-        Trace("This is Trace");
-        Info("This is Info");
-        Warn("This is Warn");
-        Error("This is Error\n");
+    // 1. 测试日志信息
+    Debug("This is Debug");
+    Trace("This is Trace");
+    Info("This is Info");
+    Warn("This is Warn");
+    Error("This is Error\n");
 
-        // // 2. 测试StableAllocator
-        testStableAllocator();
-    }
+    // // 2. 测试StableAllocator
+    testStableAllocator();
 }
