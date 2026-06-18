@@ -1,7 +1,6 @@
 #include "mod.h"
-
-/* src/kernel/process/create.c */
-#include "mod.h"
+#include "../lib/method.h"
+#include "../memory/method.h"
 
 void CreateKernelProcess(void* entry) {
     PCB* process = (PCB*)Malloc(sizeof(PCB));

@@ -1,5 +1,5 @@
 #include "mod.h"
-#include "../lib/mod.h"
+#include "../lib/method.h"
 
 BuddyAllocator globalBuddyAllocator;
 
