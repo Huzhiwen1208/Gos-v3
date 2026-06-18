@@ -1,4 +1,5 @@
-#include "mod.h"
+#include "method.h"
+#include "type.h"
 
 static Boolean Empty(Queue* self);
 static Boolean Full(Queue* self);

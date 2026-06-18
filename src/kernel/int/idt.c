@@ -1,4 +1,5 @@
-#include "mod.h"
+#include "method.h"
+#include "type.h"
 
 extern void* InterruptHandlerEntryTable[INTERRUPT_COUNT];
 static InterruptDescriptor IDT[INTERRUPT_COUNT];

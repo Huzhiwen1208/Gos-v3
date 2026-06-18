@@ -1,6 +1,6 @@
 #pragma once
-
-#include "mod.h"
+#include "../common/type.h"
+#include "type.h"
 
 // Page manager
 PhysicalAddress AllocateOnePage(MachineMode mode);

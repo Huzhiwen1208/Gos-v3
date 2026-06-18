@@ -1,4 +1,5 @@
-#include "mod.h"
+#include "method.h"
+#include "type.h"
 
 static HashTable* diskCacheMap; // key: blockID(lba) value: PhysicalAddress
 static PhysicalAddress currentCachePtr; // 当前空块缓存地址，每次使用后，+= 512

@@ -1,4 +1,5 @@
-#include "mod.h"
+#include "method.h"
+#include "type.h"
 
 #define NULL_CHAR 0 // 不可见字符
 #define CODE_PRINT_SCREEN_DOWN 0xB7

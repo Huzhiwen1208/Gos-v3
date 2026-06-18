@@ -1,5 +1,5 @@
-#include "mod.h"
-#include "../lib/mod.h"
+#include "method.h"
+#include "type.h"
 
 FrameAllocator frameAllocator;
 static void globalFrameAllocatorInit();

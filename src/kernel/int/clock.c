@@ -1,4 +1,5 @@
-#include "mod.h"
+#include "method.h"
+#include "type.h"
 
 // global variables
 /// @brief 系统从开启时钟至今的时间片(10ms)数

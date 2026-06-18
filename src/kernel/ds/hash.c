@@ -1,4 +1,5 @@
-#include "mod.h"
+#include "method.h"
+#include "type.h"
 
 static char* typeList[] = {"u32", "i32", "i8", "u8", "u16", "i16", "string", "char*", "char *"};
 

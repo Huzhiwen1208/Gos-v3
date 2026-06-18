@@ -1,4 +1,7 @@
-#include "mod.h"
+#include "../lib/method.h"
+#include "../memory/method.h"
+#include "method.h"
+#include "type.h"
 
 // global device list
 static Device* devices[DEVICE_COUNT];
@@ -43,7 +46,7 @@ u32 UninstallDevice(Device* device) {
     }
 
     u32 id = device->DeviceID;
-    Free(device);
+    Free((PhysicalAddress)device);
     devices[id] = NULL;
     return id;
 }
@@ -51,11 +54,11 @@ u32 UninstallDevice(Device* device) {
 void DeviceIoctl(u32 deviceID, u32 cmd, void *arg) {
     Device *device = GetDeviceByID(deviceID);
     if (device == NULL) {
-        return -1;
+        return;
     }
 
     if (device->Ioctl == NULL) {
-        return -1;
+        return;
     }
 
     device->Ioctl(device->DevicePtr, cmd, arg);

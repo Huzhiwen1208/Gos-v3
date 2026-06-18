@@ -1,4 +1,5 @@
-#include "mod.h"
+#include "method.h"
+#include "type.h"
 
 static u32 SystemCall(u32 syscallNum, u32 arg1, u32 arg2, u32 arg3) {
     asm volatile ("movl %0, %%eax" : : "m"(syscallNum));

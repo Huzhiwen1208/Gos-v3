@@ -1,6 +1,6 @@
 #pragma once
-
-#include "mod.h"
+#include "../common/type.h"
+#include "type.h"
 
 void InitializeInterrupt();
 void SetInterruptHandler(u32 vector, void* handler);

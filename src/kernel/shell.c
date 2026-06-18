@@ -1,4 +1,4 @@
-#include "process/mod.h"
+#include "process/method.h"
 
 extern void user_process();
 

@@ -1,13 +1,15 @@
-#include "common/mod.h"
-#include "lib/mod.h"
-#include "console/mod.h"
-#include "memory/mod.h"
-#include "int/mod.h"
-#include "process/mod.h"
-#include "device/mod.h"
-#include "disk/mod.h"
-#include "fs/mod.h"
-#include "ds/mod.h"
+#include "common/method.h"
+#include "console/method.h"
+#include "memory/method.h"
+#include "int/method.h"
+#include "gdt/method.h"
+#include "process/method.h"
+#include "device/method.h"
+#include "disk/method.h"
+#include "fs/method.h"
+#include "ds/method.h"
+
+extern void GotoGshell();
 
 void KernelMain() {
     // 清空屏幕，初始化控制台

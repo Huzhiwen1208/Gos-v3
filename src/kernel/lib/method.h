@@ -1,4 +1,6 @@
 #pragma once
+#include "../common/type.h"
+#include "type.h"
 
 #include "../common/method.h"
 #include "../console/type.h"

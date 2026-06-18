@@ -1,5 +1,5 @@
-/* src/kernel/memory/memory_mapping.c */
-#include "mod.h"
+#include "method.h"
+#include "type.h"
 
 // global var
 

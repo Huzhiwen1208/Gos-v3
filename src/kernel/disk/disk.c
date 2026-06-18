@@ -1,4 +1,5 @@
-#include "mod.h"
+#include "method.h"
+#include "type.h"
 
 static IdeController ideControllers[IDE_CONTROLLER_COUNT];
 

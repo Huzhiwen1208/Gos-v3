@@ -1,5 +1,6 @@
-/* src/kernel/gdt/gdt.c */
-#include "mod.h"
+#include "../int/type.h"
+#include "method.h"
+#include "type.h"
 
 static GlobalDescriptor GDT[SEGMENT_COUNT];
 static DescriptorTablePointer GDTR;
