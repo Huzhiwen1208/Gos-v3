@@ -1,7 +1,6 @@
 #include "mod.h"
-
-/* src/kernel/process/create.c */
-#include "mod.h"
+#include "../lib/method.h"
+#include "../memory/method.h"
 
 /// @brief 创建内核级进程
 /// @param entry: 进程入口地址

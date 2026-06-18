@@ -1,5 +1,5 @@
 #include "mod.h"
-#include "../lib/mod.h"
+#include "../lib/method.h"
 
 /// @brief 内核全局 Buddy 内存分配器
 BuddyAllocator globalBuddyAllocator;

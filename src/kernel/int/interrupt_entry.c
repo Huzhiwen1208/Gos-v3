@@ -1,4 +1,8 @@
 #include "mod.h"
+#include "method.h"
+#include "../common/method.h"
+#include "../lib/method.h"
+#include "../memory/method.h"
 
 // global variables
 void *InterruptHandlerList[INTERRUPT_COUNT];
@@ -75,7 +79,7 @@ void RestoreInterruptStatus(u8 status) {
 // static methods implementation
 
 static void defaultExceptionHandler(u32 vector) {
-    Error("Exception{%d}: %s", vector, ExceptionMessage->Get(ExceptionMessage, vector));
+    Error("Exception{%d}: %s", vector, ExceptionMessage->Get(ExceptionMessage, (void *)vector));
     Suspend();
 }
 
@@ -124,36 +128,36 @@ static void initProgrammableInterruptController() {
 
 static void initExceptionInfoMap() {
     ExceptionMessage = NewMap("u32", "string");
-    ExceptionMessage->Put(ExceptionMessage, 0, "Divide Error");
-    ExceptionMessage->Put(ExceptionMessage, 1, "Debug");
-    ExceptionMessage->Put(ExceptionMessage, 2, "NMI Interrupt");
-    ExceptionMessage->Put(ExceptionMessage, 3, "Breakpoint");
-    ExceptionMessage->Put(ExceptionMessage, 4, "Overflow");
-    ExceptionMessage->Put(ExceptionMessage, 5, "BOUND Range Exceeded");
-    ExceptionMessage->Put(ExceptionMessage, 6, "Invalid Opcode");
-    ExceptionMessage->Put(ExceptionMessage, 7, "Device Not Available");
-    ExceptionMessage->Put(ExceptionMessage, 8, "Double Fault");
-    ExceptionMessage->Put(ExceptionMessage, 9, "Coprocessor Segment Overrun");
-    ExceptionMessage->Put(ExceptionMessage, 10, "Invalid TSS");
-    ExceptionMessage->Put(ExceptionMessage, 11, "Segment Not Present");
-    ExceptionMessage->Put(ExceptionMessage, 12, "Stack-Segment Fault");
-    ExceptionMessage->Put(ExceptionMessage, 13, "General Protection");
-    ExceptionMessage->Put(ExceptionMessage, 14, "Page Fault");
-    ExceptionMessage->Put(ExceptionMessage, 15, "Reserved");
-    ExceptionMessage->Put(ExceptionMessage, 16, "x87 FPU Floating-Point Error");
-    ExceptionMessage->Put(ExceptionMessage, 17, "Alignment Check");
-    ExceptionMessage->Put(ExceptionMessage, 18, "Machine Check");
-    ExceptionMessage->Put(ExceptionMessage, 19, "SIMD Floating-Point Exception");
-    ExceptionMessage->Put(ExceptionMessage, 20, "Virtualization Exception");
-    ExceptionMessage->Put(ExceptionMessage, 21, "Control Protection Exception");
-    ExceptionMessage->Put(ExceptionMessage, 22, "Reserved");
-    ExceptionMessage->Put(ExceptionMessage, 23, "Reserved");
-    ExceptionMessage->Put(ExceptionMessage, 24, "Reserved");
-    ExceptionMessage->Put(ExceptionMessage, 25, "Reserved");
-    ExceptionMessage->Put(ExceptionMessage, 26, "Reserved");
-    ExceptionMessage->Put(ExceptionMessage, 27, "Reserved");
-    ExceptionMessage->Put(ExceptionMessage, 28, "Reserved");
-    ExceptionMessage->Put(ExceptionMessage, 29, "Reserved");
-    ExceptionMessage->Put(ExceptionMessage, 30, "Reserved");
-    ExceptionMessage->Put(ExceptionMessage, 31, "Reserved");
+    ExceptionMessage->Put(ExceptionMessage, (void *)0, "Divide Error");
+    ExceptionMessage->Put(ExceptionMessage, (void *)1, "Debug");
+    ExceptionMessage->Put(ExceptionMessage, (void *)2, "NMI Interrupt");
+    ExceptionMessage->Put(ExceptionMessage, (void *)3, "Breakpoint");
+    ExceptionMessage->Put(ExceptionMessage, (void *)4, "Overflow");
+    ExceptionMessage->Put(ExceptionMessage, (void *)5, "BOUND Range Exceeded");
+    ExceptionMessage->Put(ExceptionMessage, (void *)6, "Invalid Opcode");
+    ExceptionMessage->Put(ExceptionMessage, (void *)7, "Device Not Available");
+    ExceptionMessage->Put(ExceptionMessage, (void *)8, "Double Fault");
+    ExceptionMessage->Put(ExceptionMessage, (void *)9, "Coprocessor Segment Overrun");
+    ExceptionMessage->Put(ExceptionMessage, (void *)10, "Invalid TSS");
+    ExceptionMessage->Put(ExceptionMessage, (void *)11, "Segment Not Present");
+    ExceptionMessage->Put(ExceptionMessage, (void *)12, "Stack-Segment Fault");
+    ExceptionMessage->Put(ExceptionMessage, (void *)13, "General Protection");
+    ExceptionMessage->Put(ExceptionMessage, (void *)14, "Page Fault");
+    ExceptionMessage->Put(ExceptionMessage, (void *)15, "Reserved");
+    ExceptionMessage->Put(ExceptionMessage, (void *)16, "x87 FPU Floating-Point Error");
+    ExceptionMessage->Put(ExceptionMessage, (void *)17, "Alignment Check");
+    ExceptionMessage->Put(ExceptionMessage, (void *)18, "Machine Check");
+    ExceptionMessage->Put(ExceptionMessage, (void *)19, "SIMD Floating-Point Exception");
+    ExceptionMessage->Put(ExceptionMessage, (void *)20, "Virtualization Exception");
+    ExceptionMessage->Put(ExceptionMessage, (void *)21, "Control Protection Exception");
+    ExceptionMessage->Put(ExceptionMessage, (void *)22, "Reserved");
+    ExceptionMessage->Put(ExceptionMessage, (void *)23, "Reserved");
+    ExceptionMessage->Put(ExceptionMessage, (void *)24, "Reserved");
+    ExceptionMessage->Put(ExceptionMessage, (void *)25, "Reserved");
+    ExceptionMessage->Put(ExceptionMessage, (void *)26, "Reserved");
+    ExceptionMessage->Put(ExceptionMessage, (void *)27, "Reserved");
+    ExceptionMessage->Put(ExceptionMessage, (void *)28, "Reserved");
+    ExceptionMessage->Put(ExceptionMessage, (void *)29, "Reserved");
+    ExceptionMessage->Put(ExceptionMessage, (void *)30, "Reserved");
+    ExceptionMessage->Put(ExceptionMessage, (void *)31, "Reserved");
 }

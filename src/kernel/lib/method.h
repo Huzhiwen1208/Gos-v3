@@ -1,7 +1,9 @@
 #pragma once
 
 #include "../common/method.h"
+#include "../console/type.h"
 
+Size Vsprintf(char *buf, const char *fmt, va_list args);
 Size Printf(const char *fmt, ...);
 Size Println(const char *fmt, ...);
 Size PrintWithColor(ConsoleColor color, const char *fmt, ...);

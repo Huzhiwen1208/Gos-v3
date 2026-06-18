@@ -1,4 +1,9 @@
 #include "mod.h"
+#include "../lib/method.h"
+#include "../memory/method.h"
+#include "../process/method.h"
+
+extern void SwitchProcess(PCB *current, PCB *next);
 
 static ProcessManager processManager;
 static PIDAllocator pidAllocator;
