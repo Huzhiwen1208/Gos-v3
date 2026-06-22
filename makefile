@@ -83,3 +83,6 @@ clean:
 
 run-mac:
 	@make run -f makefile.mac
+
+build-mac:
+	@make build -f makefile.mac
