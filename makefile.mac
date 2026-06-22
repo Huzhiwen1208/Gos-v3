@@ -6,7 +6,7 @@ GccFlags+=-w -nostdinc -nostdlib -fno-pic -fno-pie -g
 
 # replace ld, objcopy in linux:binutils with ld.lld, llvm-objcopy in macos:llvm
 $(ELFKernel): $(KernelOBJ) $(UserOBJ)
-	ld.lld $(LdFlags) -Ttext $(ENTRYPOINT) $^ -o $@
+	x86_64-elf-ld $(LdFlags) -Ttext $(ENTRYPOINT) $^ -o $@
 $(NakedKernel): $(ELFKernel)
 	llvm-objcopy -O binary $< $@
 
