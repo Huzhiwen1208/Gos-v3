@@ -1,5 +1,10 @@
 #include "method.h"
 #include "type.h"
+#include "../console/method.h"
+#include "../fs/method.h"
+#include "../fs/type.h"
+#include "../lib/method.h"
+#include "../process/method.h"
 
 static void syscallTest(u32 arg1, u32 arg2, u32 arg3) {
     Info("syscall test: arg{%d, %d, %d}", arg1, arg2, arg3);
@@ -75,7 +80,7 @@ u32 TrapHandler(u32 syscallNum, u32 arg1, u32 arg2, u32 arg3) {
             syscallYield();
             break;
         case SYSCALL_READ:
-            return syscallRead(arg1, arg2);
+            return syscallRead((String)arg1, arg2);
         case SYSCALL_READ_CHAR:
             return syscallReadChar();
         case SYSCALL_GET_PID:
@@ -86,9 +91,9 @@ u32 TrapHandler(u32 syscallNum, u32 arg1, u32 arg2, u32 arg3) {
             syscallExit(arg1);
             break;
         case SYSCALL_WAIT_PID:
-            return syscallWaitPid(arg1, arg2);
+            return syscallWaitPid(arg1, (i32*)arg2);
         case SYSCALL_PWD:
-            return syscallPWD();
+            return (u32)syscallPWD();
         case SYSCALL_LS:
             syscallListDir((String)arg1, (String)arg2);
             break;
@@ -96,10 +101,10 @@ u32 TrapHandler(u32 syscallNum, u32 arg1, u32 arg2, u32 arg3) {
             syscallCreateFile((String)arg1);
             break;
         case SYSCALL_WRITE_FILE:
-            syscallWriteFile(arg1, arg2);
+            syscallWriteFile((String)arg1, (String)arg2);
             break;
         case SYSCALL_CAT_FILE:
-            syscallCatFile(arg1);
+            syscallCatFile((String)arg1);
             break;
         default:
             Panic("Unknown syscall number: %d", syscallNum);

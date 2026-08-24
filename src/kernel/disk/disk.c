@@ -1,5 +1,10 @@
 #include "method.h"
 #include "type.h"
+#include "../common/method.h"
+#include "../memory/method.h"
+#include "../device/method.h"
+#include "../ds/method.h"
+#include "../lib/method.h"
 
 static IdeController ideControllers[IDE_CONTROLLER_COUNT];
 
@@ -52,7 +57,7 @@ void InitializeIdeDisk() {
             */
             WriteByte(ideControllers[i].IoBase + IdeCommandRegister, IdeCommandIdentify); // 发送识别命令
             
-            IdeParam* param = (IdeParam*)Malloc(sizeof(IdeParam));
+            IdeParam* param = (IdeParam*)(PhysicalAddress)Malloc(sizeof(IdeParam));
             for (u32 k = 0; k < 256; k++) {
                 u16 data = ReadWord(ideControllers[i].IoBase + IdeDataRegister); // 从数据寄存器读取数据
                 ((u16*)param)[k] = data; // 将数据写入buffer
@@ -66,10 +71,10 @@ void InitializeIdeDisk() {
             disk->C = param->Cylinders;
             disk->H = param->Heads;
             disk->S = param->Sectors;
-            Free(param);
+            Free((PhysicalAddress)param);
             
             // Info("find disk{%s}, total sectors: %d", disk->Name, disk->TotalSector);
-            Device* device = (Device*)Malloc(sizeof(Device));
+            Device* device = (Device*)(PhysicalAddress)Malloc(sizeof(Device));
             MemoryCopy(device->Name, disk->Name, NAME_LENGTH);
             device->DevicePtr = disk;
             device->Type = DEVICE_TYPE_BLOCK;

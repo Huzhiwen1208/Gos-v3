@@ -1,5 +1,6 @@
 #include "method.h"
 #include "type.h"
+#include "../lib/method.h"
 
 // global var
 

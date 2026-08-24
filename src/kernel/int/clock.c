@@ -1,5 +1,8 @@
 #include "method.h"
 #include "type.h"
+#include "../common/method.h"
+#include "../lib/method.h"
+#include "../process/method.h"
 
 // global variables
 /// @brief 系统从开启时钟至今的时间片(10ms)数

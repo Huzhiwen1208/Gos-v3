@@ -1,5 +1,7 @@
 #include "method.h"
 #include "type.h"
+#include "../lib/method.h"
+#include "../memory/method.h"
 
 static VirtualAddress getCR2() {
     asm volatile ("movl %cr2, %eax");

@@ -1,5 +1,8 @@
 #include "method.h"
 #include "type.h"
+#include "../common/method.h"
+#include "../lib/method.h"
+#include "../memory/method.h"
 
 static Boolean Empty(Queue* self);
 static Boolean Full(Queue* self);
@@ -9,7 +12,7 @@ static void* Pop(Queue* self);
 
 
 Queue* NewQueue(char* type, i32 size) {
-    Queue* queue = Malloc(sizeof(Queue));
+    Queue* queue = (Queue*)Malloc(sizeof(Queue));
     queue->Front = 0;
     queue->Rear = 0;
     queue->MallocSize = size;
@@ -23,8 +26,8 @@ Queue* NewQueue(char* type, i32 size) {
 }
 
 void DeleteQueue(Queue** self) {
-    Free((*self)->Value);
-    Free(*self);
+    Free((PhysicalAddress)(*self)->Value);
+    Free((PhysicalAddress)*self);
 }
 
 

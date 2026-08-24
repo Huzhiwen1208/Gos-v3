@@ -1,4 +1,5 @@
 #include "../int/type.h"
+#include "../common/method.h"
 #include "method.h"
 #include "type.h"
 

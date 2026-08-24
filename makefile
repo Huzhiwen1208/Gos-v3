@@ -1,6 +1,8 @@
 MAC ?= 0
 AsmCompile=nasm
 CCompile=gcc
+LdCompile=ld
+ObjcopyCompile=objcopy
 IMG=img/gos.img
 FSIMG=img/fs.img
 
@@ -33,7 +35,6 @@ build: $(TARGET) $(IMG)
 
 .PHONY: $(TARGET)
 $(TARGET):
-ifeq ($(wildcard $(TARGET)),)
 	@mkdir -p $(TARGET)/bootloader
 	@mkdir -p $(TARGET)/kernel
 	@mkdir -p $(TARGET)/kernel/common
@@ -46,10 +47,8 @@ ifeq ($(wildcard $(TARGET)),)
 	@mkdir -p $(TARGET)/kernel/gdt
 	@mkdir -p $(TARGET)/kernel/disk
 	@mkdir -p $(TARGET)/kernel/device
-	@mkdir -p $(TARGET)/kernel/ds
 	@mkdir -p $(TARGET)/kernel/fs
 	@mkdir -p $(TARGET)/user
-endif
 
 # .c, .asm ---> .o ------
 $(TARGET)/kernel/%.o: $(KernelPath)/%.c
@@ -67,9 +66,9 @@ $(TARGET)/bootloader/%.bin: $(BootLoader)/%.asm
 
 # kernel made ----- 
 $(ELFKernel): $(KernelOBJ) $(UserOBJ)
-	ld $(LdFlags) -Ttext $(ENTRYPOINT) $^ -o $@
+	$(LdCompile) $(LdFlags) -Ttext $(ENTRYPOINT) $^ -o $@
 $(NakedKernel): $(ELFKernel)
-	objcopy -O binary $< $@
+	$(ObjcopyCompile) -O binary $< $@
 # ------ kernel made
 
 # img made --------
@@ -109,3 +108,6 @@ run-mac: build-mac
 
 build-mac:
 	@make build -f makefile.mac
+
+debug-mac:
+	@make debug -f makefile.mac

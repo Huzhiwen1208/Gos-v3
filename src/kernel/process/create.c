@@ -1,5 +1,12 @@
 #include "method.h"
 #include "type.h"
+#include "../common/method.h"
+#include "../gdt/type.h"
+#include "../lib/method.h"
+#include "../memory/method.h"
+
+#define Free(address) Free((PhysicalAddress)(address))
+#define MemoryCopy(dest, src, size) MemoryCopy((void*)(dest), (const void*)(src), (size))
 
 extern void RestoreContext();
 
@@ -74,7 +81,7 @@ void CreateUserProcess(void* entry) {
 
     stack -= sizeof(SwitchContext);
     SwitchContext* context = (SwitchContext*)stack;
-    context->EIP = restore;
+    context->EIP = (u32)restore;
     context->EBP = 0;
     context->ESI = 0;
     context->EDI = 0;
@@ -96,7 +103,7 @@ PID ForkProcess() {
 
     // 复制内核栈
     u32 stack = AllocateOnePage(KernelMode) + PageSize;
-    MemoryCopy(stack - PageSize, GetAddressFromPPN(GetPPNFromAddressFloor(parent->KernelStackPointer)), PageSize);
+    MemoryCopy(stack - PageSize, GetAddressFromPPN(GetPPNFromAddressFloor((PhysicalAddress)parent->KernelStackPointer)), PageSize);
     // 复制页表
     u32 childRootPPN = GetPPNFromAddressFloor(AllocateOnePage(KernelMode));
     copyPageTableRecursion(childRootPPN, parent->RootPPN);
@@ -108,7 +115,7 @@ PID ForkProcess() {
 
     stack -= sizeof(SwitchContext);
     SwitchContext* sctx = (SwitchContext*)stack;
-    sctx->EIP = restore;
+    sctx->EIP = (u32)restore;
     sctx->EBP = sctx->ESI = sctx->EDI = sctx->EBX = 0;
 
     child->KernelStackPointer = (PhysicalAddress*)stack;
@@ -125,7 +132,7 @@ void ExitProcess(i32 exitCode) {
     FreePID(current->ID); // 释放PID
     freePageTableRecursion(current->RootPPN); // 递归释放页表
     // 释放内核栈
-    FreeOnePage(GetAddressFromPPN(GetPPNFromAddressFloor(current->KernelStackPointer)));
+    FreeOnePage(GetAddressFromPPN(GetPPNFromAddressFloor((PhysicalAddress)current->KernelStackPointer)));
 
     // 将所有的子进程挂到当前进程的父进程下
     RedirectParentOfChildren();

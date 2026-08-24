@@ -1,5 +1,7 @@
 #include "method.h"
 #include "type.h"
+#include "../common/method.h"
+#include "../lib/method.h"
 
 FrameAllocator frameAllocator;
 static void globalFrameAllocatorInit();
@@ -20,7 +22,7 @@ PhysicalAddress AllocateOnePage(MachineMode mode) {
                 frameAllocator.KernelFreePageCount--;
             }
 
-            MemoryFree(GetAddressFromPPN(i), PageSize);
+            MemoryFree((void*)GetAddressFromPPN(i), PageSize);
             return GetAddressFromPPN(i);
         }
     }
@@ -51,7 +53,7 @@ PhysicalAddress AllocatePagesContinuously(MachineMode mode, u32 pageCount) {
                     }
                 }
 
-                MemoryFree(GetAddressFromPPN(i), pageCount * PageSize);
+                MemoryFree((void*)GetAddressFromPPN(i), pageCount * PageSize);
                 return GetAddressFromPPN(i);
             }
         }

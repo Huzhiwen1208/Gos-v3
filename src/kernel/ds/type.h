@@ -17,9 +17,10 @@ typedef struct HashTable {
     char* ValueType;
     Boolean Initialized;
 
-    void* (*Get)(struct HashTable* self, void* key);
-    void (*Put)(struct HashTable* self, void* key, void* value);
-    void (*Delete)(struct HashTable* self, void* key);
+    /* The map stores both numeric IDs and pointers. */
+    void* (*Get)(struct HashTable* self, ...);
+    void (*Put)(struct HashTable* self, ...);
+    void (*Delete)(struct HashTable* self, ...);
 } HashTable;
 
 

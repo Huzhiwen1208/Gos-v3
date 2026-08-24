@@ -1,5 +1,8 @@
 #include "method.h"
 #include "type.h"
+#include "../common/method.h"
+#include "../ds/method.h"
+#include "../lib/method.h"
 
 // global variables
 void*  InterruptHandlerList[INTERRUPT_COUNT];

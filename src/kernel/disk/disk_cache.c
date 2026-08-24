@@ -1,5 +1,8 @@
 #include "method.h"
 #include "type.h"
+#include "../ds/method.h"
+#include "../device/method.h"
+#include "../common/method.h"
 
 static HashTable* diskCacheMap; // key: blockID(lba) value: PhysicalAddress
 static PhysicalAddress currentCachePtr; // 当前空块缓存地址，每次使用后，+= 512
@@ -17,12 +20,12 @@ void DiskCacheRead(u32 blockID, void *buffer) {
         return;
     }
 
-    PhysicalAddress address = (PhysicalAddress)diskCacheMap->Get(diskCacheMap, blockID);
+    PhysicalAddress address = (PhysicalAddress)diskCacheMap->Get(diskCacheMap, (void*)blockID);
     // 如果缓存中没有，就从磁盘中读取, 并将读取的数据放入缓存中
     if (address == NULL) {
         DeviceRead(1, blockID, 1, buffer);
         MemoryCopy((void*)currentCachePtr, buffer, 512);
-        diskCacheMap->Put(diskCacheMap, blockID, currentCachePtr);  // 更新缓存
+        diskCacheMap->Put(diskCacheMap, (void*)blockID, (void*)currentCachePtr);  // 更新缓存
 
         currentCachePtr += 512;
         if (currentCachePtr >= BlockCacheEnd) {
@@ -42,7 +45,7 @@ void DiskCacheWrite(u32 blockID, void *buffer) {
         return;
     }
 
-    PhysicalAddress address = (PhysicalAddress)diskCacheMap->Get(diskCacheMap, blockID);
+    PhysicalAddress address = (PhysicalAddress)diskCacheMap->Get(diskCacheMap, (void*)blockID);
     if (address) {
         // 缓存存在，写入缓存
         MemoryCopy((void*)address, buffer, 512);

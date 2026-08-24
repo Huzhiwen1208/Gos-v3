@@ -1,5 +1,14 @@
 #include "method.h"
 #include "type.h"
+#include "../common/method.h"
+#include "../device/method.h"
+#include "../disk/method.h"
+#include "../ds/method.h"
+#include "../lib/method.h"
+#include "../memory/method.h"
+
+/* The allocator is addressed by 32-bit physical addresses. */
+#define Free(address) Free((PhysicalAddress)(address))
 
 /**
  * 我们第一版先不做文件系统的一级间接和二级间接。后面会进行补充 TODO
@@ -783,7 +792,7 @@ void InitializeFileSystem() {
 
     // 4. 将超级块写入磁盘
     DiskCacheWrite(0, (void*)superBlock);
-    FreeOnePage(superBlock);
+    FreeOnePage((PhysicalAddress)superBlock);
 
     // 5. 创建根目录
     InodeID id = allocateOneInodeID();

@@ -1,5 +1,8 @@
 #include "method.h"
 #include "type.h"
+#include "../common/method.h"
+#include "../lib/method.h"
+#include "../memory/method.h"
 
 static char* typeList[] = {"u32", "i32", "i8", "u8", "u16", "i16", "string", "char*", "char *"};
 
@@ -74,7 +77,7 @@ HashTable* NewMap(char* keyType, char* valueType) {
 
 void DeleteMap(HashTable** map) {
     if (!(*map)->Initialized) Panic("Hash map not initialized.");
-    Free(*map);
+    Free((PhysicalAddress)*map);
 }
 
 static u32 hash(char* keyType, void* key) {
