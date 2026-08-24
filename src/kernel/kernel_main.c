@@ -13,6 +13,8 @@ void testProcess() {
     while (1);
 }
 
+extern void TestAssembly();
+
 void KernelMain() {
     // 清空屏幕，初始化控制台
     InitializeConsole();
@@ -29,5 +31,6 @@ void KernelMain() {
     // 初始化进程管理
     InitializeProcessManager();
     CreateKernelProcess(testProcess);
+    TestAssembly();
     Schedule();
 }
