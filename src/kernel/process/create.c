@@ -1,4 +1,5 @@
 #include "mod.h"
+#include "../memory/method.h"
 
 extern void RestoreContext();
 
@@ -56,7 +57,7 @@ void CreateUserProcess(void* entry) {
 
     stack -= sizeof(SwitchContext);
     SwitchContext* context = (SwitchContext*)stack;
-    context->EIP = restore;
+    context->EIP = (u32)restore;
     context->EBP = 0;
     context->ESI = 0;
     context->EDI = 0;

@@ -5,7 +5,7 @@
 #include "int/mod.h"
 #include "process/mod.h"
 
-extern void user_process();
+extern void main();
 
 void KernelMain() {
     // 清空屏幕，初始化控制台
@@ -26,6 +26,6 @@ void KernelMain() {
     // 初始化全局描述符，TSS
     InitializeGDT();
 
-    CreateUserProcess(user_process);
+    CreateUserProcess(main);
     Schedule();
 }

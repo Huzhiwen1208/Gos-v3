@@ -21,7 +21,7 @@ PhysicalAddress AllocateOnePage(MachineMode mode) {
                 frameAllocator.KernelFreePageCount--;
             }
 
-            MemoryFree(GetAddressFromPPN(i), PageSize);
+            MemoryFree((void*)GetAddressFromPPN(i), PageSize);
             return GetAddressFromPPN(i);
         }
     }
@@ -52,7 +52,7 @@ PhysicalAddress AllocatePagesContinuously(MachineMode mode, u32 pageCount) {
                     }
                 }
 
-                MemoryFree(GetAddressFromPPN(i), pageCount * PageSize);
+                MemoryFree((void*)GetAddressFromPPN(i), pageCount * PageSize);
                 return GetAddressFromPPN(i);
             }
         }

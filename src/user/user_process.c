@@ -1,6 +1,6 @@
 #include "stdlib.h"
 
-void user_process() {
+void main() {
     while(1) {
         int a = 32;
         a = 2 + 3;

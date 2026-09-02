@@ -1,4 +1,7 @@
 #include "mod.h"
+#include "../common/method.h"
+#include "../lib/method.h"
+#include "../memory/method.h"
 
 static char* typeList[] = {"u32", "i32", "i8", "u8", "u16", "i16", "string", "char*", "char *"};
 
@@ -65,15 +68,15 @@ HashTable* NewMap(char* keyType, char* valueType) {
     result->KeyType = keyType;
     result->ValueType = valueType;
     result->Initialized = TRUE;
-    result->Get = Get;
-    result->Put = Put;
-    result->Delete = Delete;
+    result->Get = (void* (*)(HashTable*, ...))Get;
+    result->Put = (void (*)(HashTable*, ...))Put;
+    result->Delete = (void (*)(HashTable*, ...))Delete;
     return result;
 }
 
 void DeleteMap(HashTable** map) {
     if (!(*map)->Initialized) Panic("Hash map not initialized.");
-    Free(*map);
+    Free((PhysicalAddress)*map);
 }
 
 static u32 hash(char* keyType, void* key) {
