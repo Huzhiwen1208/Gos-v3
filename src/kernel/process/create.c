@@ -16,8 +16,8 @@ void CreateKernelProcess(void* entry) {
     u32 kernelProcessRootPPN = GetPPNFromAddressFloor(AllocateOnePage(KernelMode));
     process->RootPPN = kernelProcessRootPPN;
     MemoryCopy(
-        GetAddressFromPPN(kernelProcessRootPPN),
-        GetRootPageTableAddr(),
+        (void*)GetAddressFromPPN(kernelProcessRootPPN),
+        (const void*)GetRootPageTableAddr(),
         PageSize
     );
 
@@ -43,8 +43,8 @@ void CreateUserProcess(void* entry) {
     u32 userRootPPN = GetPPNFromAddressFloor(AllocateOnePage(KernelMode));
     process->RootPPN = userRootPPN;
     MemoryCopy(
-        GetAddressFromPPN(userRootPPN),
-        GetRootPageTableAddr(),
+        (void*)GetAddressFromPPN(userRootPPN),
+        (const void*)GetRootPageTableAddr(),
         PageSize
     );
 
@@ -72,7 +72,7 @@ void CreateUserProcess(void* entry) {
 
     stack -= sizeof(SwitchContext);
     SwitchContext* context = (SwitchContext*)stack;
-    context->EIP = restore;
+    context->EIP = (u32)restore;
     context->EBP = 0;
     context->ESI = 0;
     context->EDI = 0;
