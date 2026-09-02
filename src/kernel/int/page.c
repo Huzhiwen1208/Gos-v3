@@ -1,4 +1,5 @@
 #include "mod.h"
+#include "../memory/method.h"
 #include "../lib/method.h"
 
 static VirtualAddress getCR2() {

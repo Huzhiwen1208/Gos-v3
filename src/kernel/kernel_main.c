@@ -5,6 +5,8 @@
 #include "int/mod.h"
 #include "process/mod.h"
 
+void TestUserProcessWithPageing();
+
 void KernelMain() {
     // 清空屏幕，初始化控制台
     InitializeConsole();

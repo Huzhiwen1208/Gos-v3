@@ -1,4 +1,6 @@
 #include "mod.h"
+
+#define MemoryCopy(dest, src, size) MemoryCopy((void*)(dest), (const void*)(src), (size))
 #include "../lib/method.h"
 
 extern void RestoreContext();
@@ -74,7 +76,7 @@ void CreateUserProcess(void *entry) {
 
     stack -= sizeof(SwitchContext);
     SwitchContext *context = (SwitchContext *)stack;
-    context->EIP = restore;
+    context->EIP = (u32)restore;
     context->EBP = 0;
     context->ESI = 0;
     context->EDI = 0;
@@ -96,7 +98,7 @@ PID ForkProcess() {
 
     // 复制内核栈
     u32 stack = AllocateOnePage(KernelMode) + PageSize;
-    MemoryCopy(stack - PageSize, GetAddressFromPPN(GetPPNFromAddressFloor(parent->KernelStackPointer)), PageSize);
+    MemoryCopy(stack - PageSize, GetAddressFromPPN(GetPPNFromAddressFloor((PhysicalAddress)parent->KernelStackPointer)), PageSize);
     // 复制页表
     u32 childRootPPN = GetPPNFromAddressFloor(AllocateOnePage(KernelMode));
     copyPageTableRecursion(childRootPPN, parent->RootPPN);
@@ -108,7 +110,7 @@ PID ForkProcess() {
 
     stack -= sizeof(SwitchContext);
     SwitchContext *sctx = (SwitchContext *)stack;
-    sctx->EIP = restore;
+    sctx->EIP = (u32)restore;
     sctx->EBP = sctx->ESI = sctx->EDI = sctx->EBX = 0;
 
     child->KernelStackPointer = (PhysicalAddress *)stack;

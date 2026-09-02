@@ -1,5 +1,6 @@
 #include "mod.h"
 #include "../lib/method.h"
+#include "../process/method.h"
 
 static void syscallTest(u32 arg1, u32 arg2, u32 arg3) {
     Info("syscall test: arg{%d, %d, %d}", arg1, arg2, arg3);
