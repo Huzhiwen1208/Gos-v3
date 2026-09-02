@@ -1,4 +1,5 @@
 #include "mod.h"
+#include "../console/method.h"
 
 void DebugHandle(const char *file, i32 line, const char *fmt, ...) {
     char buf[1024];

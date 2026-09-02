@@ -19,6 +19,7 @@ typedef struct HashTable {
     char *ValueType;
     Boolean Initialized;
 
+    // 整数键按当前 32 位内核约定显式转换为 void *。
     void *(*Get)(struct HashTable *self, void *key);
     void (*Put)(struct HashTable *self, void *key, void *value);
     void (*Delete)(struct HashTable *self, void *key);
