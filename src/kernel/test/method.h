@@ -1,1 +1,2 @@
 void TestKernelFunction();
+void testBuddyAllocator();

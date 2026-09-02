@@ -1,5 +1,7 @@
 AsmCompile=nasm
 CCompile=gcc
+LdCompile=ld
+ObjcopyCompile=objcopy
 IMG=img/gos.img
 
 GccFlags=-m32 -fno-builtin -fno-stack-protector -march=pentium
@@ -27,7 +29,6 @@ build: $(TARGET) $(IMG)
 
 .PHONY: $(TARGET)
 $(TARGET):
-ifeq ($(wildcard $(TARGET)),)
 	@mkdir -p $(TARGET)/bootloader
 	@mkdir -p $(TARGET)/kernel
 	@mkdir -p $(TARGET)/kernel/common
@@ -35,7 +36,6 @@ ifeq ($(wildcard $(TARGET)),)
 	@mkdir -p $(TARGET)/kernel/lib
 	@mkdir -p $(TARGET)/kernel/memory
 	@mkdir -p $(TARGET)/kernel/test
-endif
 
 # .c, .asm ---> .o ------
 $(TARGET)/kernel/%.o: $(KernelPath)/%.c
@@ -53,9 +53,9 @@ $(TARGET)/bootloader/%.bin: $(BootLoader)/%.asm
 
 # kernel made ----- 
 $(ELFKernel): $(KernelOBJ) $(UserOBJ)
-	ld $(LdFlags) -Ttext $(ENTRYPOINT) $^ -o $@
+	$(LdCompile) $(LdFlags) -Ttext $(ENTRYPOINT) $^ -o $@
 $(NakedKernel): $(ELFKernel)
-	objcopy -O binary $< $@
+	$(ObjcopyCompile) -O binary $< $@
 # ------ kernel made
 
 # img made --------
