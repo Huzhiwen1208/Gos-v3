@@ -6,6 +6,7 @@
 Size Printf(const char *fmt, ...);
 Size Println(const char *fmt, ...);
 Size PrintWithColor(ConsoleColor color, const char *fmt, ...);
+Size Vsprintf(char *buf, const char *fmt, va_list args);
 void Panic(const char *fmt, ...);
 
 // Assertion

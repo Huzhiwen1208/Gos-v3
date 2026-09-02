@@ -1,8 +1,11 @@
-#pragma once
+#ifndef GOS_KERNEL_USER_LIB_MOD_H
+#define GOS_KERNEL_USER_LIB_MOD_H
 
 #include "../lib/mod.h"
 
 void SyscallTest();
+
+#endif
 void SyscallPrint(String message, Size len);
 u32 Fork();
 void Yield();
