@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GOS_KERNEL_USER_LIB_MOD_H
+#define GOS_KERNEL_USER_LIB_MOD_H
 
 #include "../lib/mod.h"
 
@@ -12,3 +13,5 @@ u32 GetTime();
 void Exit(i32 exitCode);
 PID WaitPid(PID pid, i32* exitCode);
 PID GetPPID();
+
+#endif // GOS_KERNEL_USER_LIB_MOD_H
