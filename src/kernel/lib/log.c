@@ -9,7 +9,6 @@ void DebugHandle(const char *file, i32 line, const char *fmt, ...) {
     PrintWithColor(CYAN,"DEBUG: ");
     PrintWithColor(CYAN,"[%s:%d]",file,line);
     PrintWithColor(CYAN,buf);
-
 }
 
 void TraceHandle(const char *file, i32 line, const char *fmt, ...) {
