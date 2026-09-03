@@ -1,9 +1,12 @@
 AsmCompile=nasm
 CCompile=gcc
+LdCompile=ld
+ObjcopyCompile=objcopy
 IMG=img/gos.img
 
 GccFlags=-m32 -fno-builtin -fno-stack-protector -march=pentium
 GccFlags+=-w -nostdinc -nostdlib -fno-pic -fno-pie -g
+DependencyFlags=-MMD -MP
 LdFlags=-m elf_i386 -static
 
 TARGET=target
@@ -40,9 +43,9 @@ endif
 
 # .c, .asm ---> .o ------
 $(TARGET)/kernel/%.o: $(KernelPath)/%.c
-	$(CCompile) $(GccFlags) -c -o $@ $<
+	$(CCompile) $(GccFlags) $(DependencyFlags) -c -o $@ $<
 $(TARGET)/user/%.o: $(UserPath)/%.c
-	$(CCompile) $(GccFlags) -c -o $@ $<
+	$(CCompile) $(GccFlags) $(DependencyFlags) -c -o $@ $<
 $(TARGET)/kernel/%.o: $(KernelPath)/%.asm
 	$(AsmCompile) -f elf32 -g $< -o $@ 
 # ----- .c, .asm ---> .o
@@ -54,9 +57,9 @@ $(TARGET)/bootloader/%.bin: $(BootLoader)/%.asm
 
 # kernel made ----- 
 $(ELFKernel): $(KernelOBJ) $(UserOBJ)
-	ld $(LdFlags) -Ttext $(ENTRYPOINT) $^ -o $@
+	$(LdCompile) $(LdFlags) -Ttext $(ENTRYPOINT) $^ -o $@
 $(NakedKernel): $(ELFKernel)
-	objcopy -O binary $< $@
+	$(ObjcopyCompile) -O binary $< $@
 # ------ kernel made
 
 # img made --------
@@ -95,3 +98,7 @@ debug-mac:
 
 build-mac:
 	@make build -f makefile.mac
+
+
+# Rebuild C objects when their included headers change.
+-include $(KernelOBJ:.o=.d) $(UserOBJ:.o=.d)
