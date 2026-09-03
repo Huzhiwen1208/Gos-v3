@@ -1,4 +1,5 @@
 #include "mod.h"
+#include "../console/type.h"
 
 /**
  * 我们第一版先不做文件系统的一级间接和二级间接。后面会进行补充 TODO

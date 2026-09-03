@@ -1,5 +1,7 @@
 AsmCompile=nasm
 CCompile=gcc
+LdCompile=ld
+ObjcopyCompile=objcopy
 IMG=img/gos.img
 FSIMG=img/fs.img
 
@@ -66,9 +68,9 @@ $(TARGET)/bootloader/%.bin: $(BootLoader)/%.asm
 
 # kernel made ----- 
 $(ELFKernel): $(KernelOBJ) $(UserOBJ)
-	ld $(LdFlags) -Ttext $(ENTRYPOINT) $^ -o $@
+	$(LdCompile) $(LdFlags) -Ttext $(ENTRYPOINT) $^ -o $@
 $(NakedKernel): $(ELFKernel)
-	objcopy -O binary $< $@
+	$(ObjcopyCompile) -O binary $< $@
 # ------ kernel made
 
 # img made --------
