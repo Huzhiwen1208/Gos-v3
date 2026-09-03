@@ -1,18 +1,41 @@
 #include "common/mod.h"
-#include "lib/mod.h"
+#include "console/mod.h"
 #include "console/type.h"
-#include "console/method.h"
-#include "memory/mod.h"
-#include "int/mod.h"
-#include "process/mod.h"
-#include "disk/mod.h"
 #include "device/mod.h"
+#include "disk/mod.h"
 #include "fs/mod.h"
+#include "int/mod.h"
+#include "lib/mod.h"
+#include "memory/mod.h"
+#include "process/mod.h"
 
-// 进程列表
-void ProcessA();
-void ProcessB();
-void ProcessC();
+#define TEST_DISK_ID 0
+#define TEST_DISK_BLOCK 128
+#define TEST_SECTOR_SIZE 512
+
+static u32 passedCount;
+static u32 failedCount;
+
+static void beginTest(const char *name);
+static Boolean expect(Boolean condition, const char *name);
+static void endSuite();
+static void fillPattern(u8 *buffer, u8 seed);
+static Boolean equalBuffer(const u8 *left, const u8 *right, Size size);
+
+static void testMemoryAllocator();
+static void testDiskReadWriteRestore();
+static void testFileSystemCrud();
+
+/* 调度测试：这些测试会把控制权交给调度器，不能放进默认同步测试套件。 */
+void TestKernelProcessWithPaging();
+void TestUserProcessWithPageing();
+void TestClockInterrupt();
+void TestSyscallGetTime();
+void TestSyscallRead();
+void TestSyscallGetPid();
+void TestSyscallExit();
+void TestSyscallWaitPid();
+
 extern void user_process();
 extern void syscall_get_time_test1();
 extern void syscall_get_time_test2();
@@ -25,118 +48,157 @@ extern void syscall_exit_test1();
 extern void syscall_exit_test2();
 extern void syscall_wait_pid_test();
 
-// 测试方法列表
-void TestKernelProcessWithPaging();  // 分页开启后的内核级进程调度测试
-void TestUserProcessWithPageing();  // 分页开启后的用户级进程调度测试
-void TestClockInterrupt();          // 时钟中断测试
-void TestSyscallGetTime();          // 系统调用Read测试
-void TestSyscallRead();             // 系统调用Read测试
-void TestSyscallGetPid();           // 系统调用GetPid测试
-void TestSyscallExit();             // 系统调用Exit测试
-void TestSyscallWaitPid();          // 系统调用WaitPid测试
-void TestReadWriteDisk();           // 读写磁盘测试
-void TestFileSystem();              // 测试文件系统方法
-
-// 测试套件，主测试方法
 void KernelMainTest() {
-    // TestKernelProcessWithPaging();
-    // TestUserProcessWithPageing();
-    // TestClockInterrupt();
-    // TestSyscallGetTime();
-    // TestSyscallRead();
-    // TestSyscallGetPid();
-    // TestSyscallExit();
-    // TestSyscallWaitPid();
-    // TestReadWriteDisk();
-    TestFileSystem();
+    passedCount = 0;
+    failedCount = 0;
+    PrintWithColor(CYAN, "\n========== Kernel test suite ==========" "\n");
+
+    testMemoryAllocator();
+    testDiskReadWriteRestore();
+    testFileSystemCrud();
+
+    endSuite();
 }
 
+static void testMemoryAllocator() {
+    beginTest("memory allocator");
+    PhysicalAddress first = Malloc(64);
+    PhysicalAddress second = Malloc(512);
 
-// 测试方法具体实现
-void TestKernelProcessWithPaging(){
+    expect(first != NULL, "allocates a small block");
+    expect(second != NULL, "allocates a medium block");
+    expect(first != second, "keeps allocations distinct");
+
+    Free(first);
+    PhysicalAddress reused = Malloc(64);
+    expect(reused == first, "reuses a released block");
+
+    Free(reused);
+    Free(second);
+}
+
+/* 在空闲区域验证块设备 I/O，并无条件恢复写入前的数据。 */
+static void testDiskReadWriteRestore() {
+    beginTest("disk read/write and restore");
+    u8 *original = (u8 *)Malloc(TEST_SECTOR_SIZE);
+    u8 *pattern = (u8 *)Malloc(TEST_SECTOR_SIZE);
+    u8 *readback = (u8 *)Malloc(TEST_SECTOR_SIZE);
+
+    expect(original != NULL && pattern != NULL && readback != NULL, "allocates I/O buffers");
+    if (original == NULL || pattern == NULL || readback == NULL) {
+        if (original != NULL) Free((PhysicalAddress)original);
+        if (pattern != NULL) Free((PhysicalAddress)pattern);
+        if (readback != NULL) Free((PhysicalAddress)readback);
+        return;
+    }
+
+    if (!expect(DeviceRead(TEST_DISK_ID, TEST_DISK_BLOCK, 1, original) == TEST_SECTOR_SIZE,
+                "reads original sector")) {
+        Free((PhysicalAddress)original);
+        Free((PhysicalAddress)pattern);
+        Free((PhysicalAddress)readback);
+        return;
+    }
+
+    fillPattern(pattern, 0x5a);
+    expect(DeviceWrite(TEST_DISK_ID, TEST_DISK_BLOCK, 1, pattern) == TEST_SECTOR_SIZE,
+           "writes test pattern");
+    expect(DeviceRead(TEST_DISK_ID, TEST_DISK_BLOCK, 1, readback) == TEST_SECTOR_SIZE,
+           "reads written pattern");
+    expect(equalBuffer(pattern, readback, TEST_SECTOR_SIZE), "preserves sector contents");
+    expect(DeviceWrite(TEST_DISK_ID, TEST_DISK_BLOCK, 1, original) == TEST_SECTOR_SIZE,
+           "restores original sector");
+
+    Free((PhysicalAddress)original);
+    Free((PhysicalAddress)pattern);
+    Free((PhysicalAddress)readback);
+}
+
+static void testFileSystemCrud() {
+    const String directory = "/kernel_test";
+    const String file = "/kernel_test/data.txt";
+    const String filename = "data.txt";
+    const String content = "kernel filesystem test\n.";
+    const String firstLine = "kernel filesystem test";
+    char line[64];
+    Boolean createdDirectory;
+    Boolean enteredDirectory;
+
+    beginTest("filesystem CRUD");
+    RemoveFile("-r", directory);  // 清除前次测试残留；不存在时允许失败。
+    createdDirectory = MakeDirectory(directory, "-p");
+    expect(createdDirectory, "creates test directory");
+    if (!createdDirectory) return;
+
+    enteredDirectory = ChangeDirectory(directory);
+    expect(enteredDirectory, "enters test directory");
+    if (!enteredDirectory) {
+        RemoveFile("-r", directory);
+        return;
+    }
+
+    expect(CreateFile(-1, filename, FT_FILE) != (InodeID)-1, "creates test file");
+    expect(WriteFileContent(file, content, TRUE), "writes test file");
+    expect(ReadFileLine(file, 1, line), "reads first line");
+    expect(StringEqual(line, firstLine), "reads back expected content");
+    expect(ChangeDirectory("/"), "returns to root directory");
+    expect(RemoveFile("-r", directory), "removes test directory");
+}
+
+static void beginTest(const char *name) {
+    PrintWithColor(LIGHT_BLUE, "[TEST] %s\n", name);
+}
+
+static Boolean expect(Boolean condition, const char *name) {
+    if (condition) {
+        passedCount++;
+        PrintWithColor(GREEN, "  PASS: %s\n", name);
+    } else {
+        failedCount++;
+        PrintWithColor(LIGHT_RED, "  FAIL: %s\n", name);
+    }
+    return condition;
+}
+
+static void endSuite() {
+    ConsoleAlignLine();
+    if (failedCount == 0) {
+        PrintWithColor(GREEN, "Kernel tests passed: %d assertions\n", passedCount);
+    } else {
+        PrintWithColor(LIGHT_RED, "Kernel tests failed: %d passed, %d failed\n", passedCount, failedCount);
+    }
+}
+
+static void fillPattern(u8 *buffer, u8 seed) {
+    for (Size index = 0; index < TEST_SECTOR_SIZE; index++) {
+        buffer[index] = seed + index;
+    }
+}
+
+static Boolean equalBuffer(const u8 *left, const u8 *right, Size size) {
+    for (Size index = 0; index < size; index++) {
+        if (left[index] != right[index]) return FALSE;
+    }
+    return TRUE;
+}
+
+void TestKernelProcessWithPaging() {
+    extern void ProcessA();
+    extern void ProcessB();
+    extern void ProcessC();
     CreateKernelProcess(ProcessA);
     CreateKernelProcess(ProcessB);
     CreateKernelProcess(ProcessC);
     Schedule();
 }
 
-void TestUserProcessWithPageing() {
-    CreateUserProcess(user_process);
-    Schedule();
-}
-
-void TestClockInterrupt() {
-    CreateKernelProcess(ProcessA);
-    CreateKernelProcess(ProcessB);
-    CreateKernelProcess(ProcessC);
-}
-
-void TestSyscallGetTime() {
-    CreateUserProcess(syscall_get_time_test1);
-    CreateUserProcess(syscall_get_time_test2);
-    CreateUserProcess(syscall_get_time_test3);
-}
-
-void TestSyscallRead() {
-    CreateUserProcess(syscall_read_test);
-}
-
-void TestSyscallGetPid() {
-    CreateUserProcess(syscall_get_pid_test1);
-    CreateUserProcess(syscall_get_pid_test2);
-    CreateUserProcess(syscall_get_pid_test3);
-}
-
-void TestSyscallExit() {
-    CreateUserProcess(syscall_exit_test1);
-    CreateUserProcess(syscall_exit_test2);
-}
-
-void TestSyscallWaitPid() {
-    CreateUserProcess(syscall_wait_pid_test);
-}
-
-void TestReadWriteDisk() {
-    // 读写磁盘测试
-    char* buffer = (char*)Malloc(512);
-    int i;
-    for (i = 0; i < 512; i++) {
-        buffer[i] = 8;
-    }
-    DeviceWrite(0, 0, 1, buffer);
-    DeviceRead(0, 0, 1, buffer);
-    for (i = 0; i < 512; i++) {
-        if (buffer[i] != 8) {
-            PrintWithColor(RED, "Read/Write Disk Error!\n");
-            break;
-        }
-    }
-    if (i == 512) {
-        PrintWithColor(GREEN, "Read/Write Disk Success!\n");
-    }
-}
-
-void TestFileSystem() {
-    CreateFile(-1, "test.txt", FT_FILE);
-    CreateFile(-1, "test2.txt", FT_FILE);
-    ListFiles("", ".");
-    WriteFileContent("/test.txt", "Hello World!\n", FALSE);
-    WriteFileContent("/test.txt", "Hello World!\n", FALSE);
-    WriteFileContent("/test.txt", "Hello World!\n", FALSE);
-    WriteFileContent("/test.txt", "Hello World!\n", FALSE);
-    PrintFileContent("test.txt", 3);
-
-    MakeDirectory("/test", "");
-    MakeDirectory("/testdir/x1", "-p");
-    MakeDirectory("/testdir/x33", "-p");
-    ChangeDirectory("/testdir/");
-    ListFiles("", ".");
-    ChangeDirectory("/");
-
-    ListFiles("", ".");
-    RemoveFile("-r", "/test");
-    ListFiles("", "/");
-}
+void TestUserProcessWithPageing() { CreateUserProcess(user_process); Schedule(); }
+void TestClockInterrupt() { CreateKernelProcess(TestKernelProcessWithPaging); }
+void TestSyscallGetTime() { CreateUserProcess(syscall_get_time_test1); CreateUserProcess(syscall_get_time_test2); CreateUserProcess(syscall_get_time_test3); }
+void TestSyscallRead() { CreateUserProcess(syscall_read_test); }
+void TestSyscallGetPid() { CreateUserProcess(syscall_get_pid_test1); CreateUserProcess(syscall_get_pid_test2); CreateUserProcess(syscall_get_pid_test3); }
+void TestSyscallExit() { CreateUserProcess(syscall_exit_test1); CreateUserProcess(syscall_exit_test2); }
+void TestSyscallWaitPid() { CreateUserProcess(syscall_wait_pid_test); }
 
 void ProcessA() {
     while (TRUE) {

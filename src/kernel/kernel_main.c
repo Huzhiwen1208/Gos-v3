@@ -9,6 +9,8 @@
 #include "fs/mod.h"
 #include "ds/mod.h"
 
+void GotoGshell();
+
 void KernelMain() {
     // 清空屏幕，初始化控制台
     InitializeConsole();
