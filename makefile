@@ -1,5 +1,7 @@
 AsmCompile=nasm
 CCompile=gcc
+LdCompile=ld
+ObjcopyCompile=objcopy
 IMG=img/gos.img
 
 GccFlags=-m32 -fno-builtin -fno-stack-protector -march=pentium
@@ -48,9 +50,9 @@ $(TARGET)/bootloader/%.bin: $(BootLoader)/%.asm
 
 # kernel made ----- 
 $(ELFKernel): $(KernelOBJ) $(UserOBJ)
-	ld $(LdFlags) -Ttext $(ENTRYPOINT) $^ -o $@
+	$(LdCompile) $(LdFlags) -Ttext $(ENTRYPOINT) $^ -o $@
 $(NakedKernel): $(ELFKernel)
-	objcopy -O binary $< $@
+	$(ObjcopyCompile) -O binary $< $@
 # ------ kernel made
 
 # TODO3: 补充 middle.bin 的磁盘写入
@@ -66,7 +68,7 @@ ifeq ($(wildcard img),)
 	@mkdir img
 endif
 ifeq ($(wildcard $(IMG)),)
-	bximage -q -hd=16 -mode=create -sectsize=512 -imgmode=flat $(IMG)
+	bximage -q -hd=16 -func=create -sectsize=512 -imgmode=flat $(IMG)
 endif
 # ------- img made
 
