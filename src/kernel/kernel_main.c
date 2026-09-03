@@ -1,9 +1,14 @@
 #include "common/mod.h"
-#include "lib/mod.h"
-#include "console/mod.h"
-#include "memory/mod.h"
-#include "int/mod.h"
-#include "process/mod.h"
+#include "console/type.h"
+#include "console/method.h"
+#include "lib/method.h"
+#include "memory/type.h"
+#include "memory/method.h"
+#include "int/type.h"
+#include "int/method.h"
+#include "process/type.h"
+#include "process/method.h"
+#include "gdt/method.h"
 
 extern void user_process();
 
