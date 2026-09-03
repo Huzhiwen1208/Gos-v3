@@ -60,6 +60,7 @@ $(TARGET)/bootloader/%.bin: $(BootLoader)/%.asm
 # ------ bootloader
 
 # kernel made ----- 
+ifeq ($(MAC),0)
 $(ELFKernel): $(KernelOBJ) $(UserOBJ)
 	ld $(LdFlags) -Ttext $(ENTRYPOINT) $^ -o $@
 $(NakedKernel): $(ELFKernel)
@@ -79,6 +80,7 @@ ifeq ($(wildcard img),)
 endif
 ifeq ($(wildcard $(IMG)),)
 	bximage -q -hd=16 -func=create -sectsize=512 -imgmode=flat $(IMG)
+endif
 endif
 # ------- img made
 
