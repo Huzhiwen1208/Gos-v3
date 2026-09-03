@@ -1,4 +1,5 @@
 #include "common/mod.h"
+#include "console/type.h"
 #include "lib/mod.h"
 #include "console/mod.h"
 #include "memory/mod.h"
