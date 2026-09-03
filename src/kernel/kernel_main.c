@@ -8,6 +8,8 @@
 #include "int/mod.h"
 #include "process/mod.h"
 
+void RunPrioritySchedulerTest();
+
 void A() {
     while (TRUE) {
         Printf("This is A process!\n");
@@ -44,8 +46,6 @@ void KernelMain() {
 
     // 初始化进程管理
     InitializeProcessManager();
-    CreateKernelProcess(A);
-    CreateKernelProcess(B);
-    CreateKernelProcess(C);
+    RunPrioritySchedulerTest();
     Schedule();
 }

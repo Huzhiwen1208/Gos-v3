@@ -2,12 +2,13 @@
 #include "../lib/method.h"
 #include "../memory/method.h"
 
-void CreateKernelProcess(void* entry) {
+void CreateKernelProcessWithPriority(void* entry, ProcessPriority priority) {
     PCB* process = (PCB*)Malloc(sizeof(PCB));
     process->ID = AllocatePID();
     process->Status = PROCESS_STATE_RUNNABLE;
     u32 stack = AllocateOnePage(KernelMode) + PageSize;
     process->Type = PROCESS_TYPE_KERNEL;
+    process->Priority = priority;
 
     stack -= sizeof(SwitchContext);
     SwitchContext* context = (SwitchContext*)stack;
@@ -19,4 +20,8 @@ void CreateKernelProcess(void* entry) {
     process->KernelStackPointer = (PhysicalAddress*)stack;
 
     AddProcess(process);
+}
+
+void CreateKernelProcess(void* entry) {
+    CreateKernelProcessWithPriority(entry, PROCESS_PRIORITY_NORMAL);
 }

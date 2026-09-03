@@ -13,11 +13,21 @@ typedef enum ProcessType {
     PROCESS_TYPE_KERNEL
 } ProcessType;
 
+/* 数值越大，调度优先级越高。 */
+typedef enum ProcessPriority {
+    PROCESS_PRIORITY_IDLE = 0,
+    PROCESS_PRIORITY_LOW,
+    PROCESS_PRIORITY_NORMAL,
+    PROCESS_PRIORITY_HIGH,
+    PROCESS_PRIORITY_REALTIME
+} ProcessPriority;
+
 typedef struct PCB {
     PhysicalAddress* KernelStackPointer;
     PID ID;
     ProcessState Status;
     ProcessType Type;
+    ProcessPriority Priority;
 } PCB;
 
 // PID allocator

@@ -22,7 +22,7 @@ void InitializeProcessManager() {
         processManager.RunnableProcesses[i] = NULL;
     }
     processManager.Front = processManager.Rear = 0;
-    CreateKernelProcess(idle);
+    CreateKernelProcessWithPriority(idle, PROCESS_PRIORITY_IDLE);
     idleProcess = fetchProcess();
 }
 
@@ -75,6 +75,10 @@ void Schedule() {
         AddProcess(current);
     }
 
+    if (current == idleProcess && isEmpty()) {
+        return;
+    }
+
     PCB* next = fetchProcess();
     next->Status = PROCESS_STATE_RUNNING;
 
@@ -96,12 +100,33 @@ static void runFirstProcess() {
 
 static PCB* fetchProcess() {
     if (isEmpty()) {
-        Panic("Queue is empty");
+        return idleProcess;
     }
 
-    PCB* result = processManager.RunnableProcesses[processManager.Front];
-    processManager.RunnableProcesses[processManager.Front] = NULL;
-    processManager.Front = (processManager.Front + 1 ) % MAX_PROCESS_COUNT;
+    /*
+     * 在环形就绪队列中选择优先级最高的进程。
+     * 从队首开始扫描；同一优先级不覆盖已选项，因此保持 FIFO 轮转。
+     */
+    u32 selected = processManager.Front;
+    for (u32 index = (processManager.Front + 1) % MAX_PROCESS_COUNT;
+         index != processManager.Rear;
+         index = (index + 1) % MAX_PROCESS_COUNT) {
+        if (processManager.RunnableProcesses[index]->Priority
+                > processManager.RunnableProcesses[selected]->Priority) {
+            selected = index;
+        }
+    }
+
+    PCB* result = processManager.RunnableProcesses[selected];
+
+    /* 删除选中项并保持其余就绪进程的相对入队顺序。 */
+    u32 last = (processManager.Rear + MAX_PROCESS_COUNT - 1) % MAX_PROCESS_COUNT;
+    for (u32 index = selected; index != last; index = (index + 1) % MAX_PROCESS_COUNT) {
+        u32 next = (index + 1) % MAX_PROCESS_COUNT;
+        processManager.RunnableProcesses[index] = processManager.RunnableProcesses[next];
+    }
+    processManager.RunnableProcesses[last] = NULL;
+    processManager.Rear = last;
 
     return result;
 }

@@ -8,3 +8,4 @@ void AddProcess(PCB* process);
 void Schedule();
 
 void CreateKernelProcess(void* entry);
+void CreateKernelProcessWithPriority(void* entry, ProcessPriority priority);
