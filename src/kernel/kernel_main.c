@@ -1,7 +1,13 @@
-#include "common/mod.h"
-#include "lib/mod.h"
-#include "console/mod.h"
-#include "memory/mod.h"
+#include "common/type.h"
+#include "console/method.h"
+#include "console/type.h"
+#include "lib/method.h"
+#include "lib/type.h"
+#include "memory/method.h"
+#include "memory/type.h"
+
+void testBuddyAllocator();
+void testStableAllocator();
 
 void KernelMain() {
     // 清空屏幕，初始化控制台
