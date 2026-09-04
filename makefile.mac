@@ -1,14 +1,16 @@
+MAC=1
 include Makefile
 
 CCompile=x86_64-elf-gcc
-GccFlags=-m32 -fno-builtin -fno-stack-protector -mno-sse
+GccFlags=-m32 -fno-builtin -fno-stack-protector -mno-sse -std=gnu11
+GccFlags+=-Wno-error=implicit-function-declaration -Wno-error=int-conversion
 GccFlags+=-w -nostdinc -nostdlib -fno-pic -fno-pie -g
 
-# replace ld, objcopy in linux:binutils with ld.lld, llvm-objcopy in macos:llvm
+# 使用 Homebrew 交叉工具链；避免依赖未安装的 ld.lld。
 $(ELFKernel): $(KernelOBJ) $(UserOBJ)
-	ld.lld $(LdFlags) -Ttext $(ENTRYPOINT) $^ -o $@
+	x86_64-elf-ld $(LdFlags) -Ttext $(ENTRYPOINT) $^ -o $@
 $(NakedKernel): $(ELFKernel)
-	llvm-objcopy -O binary $< $@
+	x86_64-elf-objcopy -O binary $< $@
 
 image:
 ifeq ($(wildcard img),)

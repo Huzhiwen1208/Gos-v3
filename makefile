@@ -60,10 +60,12 @@ $(TARGET)/bootloader/%.bin: $(BootLoader)/%.asm
 # ------ bootloader
 
 # kernel made ----- 
+ifeq ($(MAC),0)
 $(ELFKernel): $(KernelOBJ) $(UserOBJ)
 	ld $(LdFlags) -Ttext $(ENTRYPOINT) $^ -o $@
 $(NakedKernel): $(ELFKernel)
 	objcopy -O binary $< $@
+endif
 # ------ kernel made
 
 # img made --------
@@ -73,12 +75,14 @@ $(IMG): $(TARGET)/bootloader/boot.bin $(TARGET)/bootloader/loader.bin \
 	dd if=$(word 2, $^) of=$@ bs=512 count=3 seek=1 conv=notrunc
 	dd if=$(word 3, $^) of=$@ bs=512 count=250 seek=4 conv=notrunc
 
+ifeq ($(MAC),0)
 image:
 ifeq ($(wildcard img),)
 	@mkdir img
 endif
 ifeq ($(wildcard $(IMG)),)
 	bximage -q -hd=16 -func=create -sectsize=512 -imgmode=flat $(IMG)
+endif
 endif
 # ------- img made
 

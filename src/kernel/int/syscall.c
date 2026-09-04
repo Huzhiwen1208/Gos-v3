@@ -136,7 +136,7 @@ u32 TrapHandler(u32 syscallNum, u32 arg1, u32 arg2, u32 arg3) {
         break;
     case SYSCALL_TASK_INFO:
         syscallTaskInfo((TaskInfo *)arg1);
-        return;
+        break;
     case SYSCALL_SLEEP:
         syscallSleep(arg1);
         break;
