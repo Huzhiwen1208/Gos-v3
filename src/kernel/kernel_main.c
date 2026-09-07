@@ -7,6 +7,8 @@
 #include "device/mod.h"
 #include "disk/mod.h"
 
+void KernelMainTest();
+
 void KernelMain() {
     // 清空屏幕，初始化控制台
     InitializeConsole();

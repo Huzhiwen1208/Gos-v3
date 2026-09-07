@@ -1,14 +1,15 @@
 include Makefile
 
 CCompile=x86_64-elf-gcc
-GccFlags=-m32 -fno-builtin -fno-stack-protector -mno-sse
+GccFlags=-m32 -fno-builtin -fno-stack-protector -mno-sse -std=gnu11
+GccFlags+=-Wno-error=implicit-function-declaration -Wno-error=int-conversion -Wno-error=return-mismatch
 GccFlags+=-w -nostdinc -nostdlib -fno-pic -fno-pie -g
 
-# replace ld, objcopy in linux:binutils with ld.lld, llvm-objcopy in macos:llvm
+# Use the Homebrew cross-binutils that match x86_64-elf-gcc.
 $(ELFKernel): $(KernelOBJ) $(UserOBJ)
-	ld.lld $(LdFlags) -Ttext $(ENTRYPOINT) $^ -o $@
+	x86_64-elf-ld $(LdFlags) -Ttext $(ENTRYPOINT) $^ -o $@
 $(NakedKernel): $(ELFKernel)
-	llvm-objcopy -O binary $< $@
+	x86_64-elf-objcopy -O binary $< $@
 
 image:
 ifeq ($(wildcard img),)
@@ -16,4 +17,7 @@ ifeq ($(wildcard img),)
 endif
 ifeq ($(wildcard $(IMG)),)
 	bximage -q -hd=16 -func=create -sectsize=512 -imgmode=flat $(IMG)
+endif
+ifeq ($(wildcard $(FSIMG)),)
+	bximage -q -hd=128 -func=create -sectsize=512 -imgmode=flat $(FSIMG)
 endif
