@@ -8,7 +8,7 @@
  * ps
  * clear
  * echo √
- * ipaddr
+ * tab 键补齐
 */
 
 #include "stdlib.h"
@@ -57,6 +57,14 @@ void shell() {
 
         char line[1024];
         Read(line, sizeof(line) - 1);
+
+        // TODO: tab键补齐命令，提示命令参数
+        for (int i = 0; line[i] != '\0'; i++) {
+            if (line[i] == '\t') {
+                Panic("Unimplemented!");
+            }
+        }
+
         parse_command(line);
 
         if (argc == 0) {
@@ -64,7 +72,18 @@ void shell() {
         }
         
         char* cmd = argv[0]; // 命令
-        if (strcmp(cmd, "ls") == 0) {
+        // TODO: 补齐如下命令实现
+        if (strcmp(cmd, "pwd") == 0) {
+            Panic("Unimplemented!");
+        } else if (strcmp(cmd, "cd") == 0) {
+            Panic("Unimplemented!");
+        } else if (strcmp(cmd, "mkdir") == 0) {
+            Panic("Unimplemented!");
+        } else if (strcmp(cmd, "ps") == 0) {
+            Panic("Unimplemented!");
+        } else if (strcmp(cmd, "clear") == 0) {
+            Panic("Unimplemented!");
+        } else if (strcmp(cmd, "ls") == 0) {
             /**
              * ls、ls path、ls -a path
             */
