@@ -51,11 +51,11 @@ u32 UninstallDevice(Device* device) {
 void DeviceIoctl(u32 deviceID, u32 cmd, void *arg) {
     Device *device = GetDeviceByID(deviceID);
     if (device == NULL) {
-        return -1;
+        return;
     }
 
     if (device->Ioctl == NULL) {
-        return -1;
+        return;
     }
 
     device->Ioctl(device->DevicePtr, cmd, arg);
