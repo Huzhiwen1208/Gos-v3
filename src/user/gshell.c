@@ -17,6 +17,27 @@
 int argc = 0;
 char argv[100][100];
 
+static void parse_command(const char* line) {
+    argc = 0;
+    memset(argv, 0, sizeof(argv));
+
+    int argLength = 0;
+    for (int i = 0; line[i] != '\0' && argc < 100; i++) {
+        if (line[i] == ' ' || line[i] == '\t') {
+            if (argLength > 0) {
+                argc++;
+                argLength = 0;
+            }
+        } else if (argLength < 99) {
+            argv[argc][argLength++] = line[i];
+        }
+    }
+
+    if (argLength > 0 && argc < 100) {
+        argc++;
+    }
+}
+
 int is_empty(char* name) {
     for (int i = 0; name[i]; i++) {
         if (name[i] != ' ' && name[i] != '\t' && name[i] != '\n') {
@@ -35,25 +56,13 @@ void shell() {
 
         printf("%s@%s:%s$ ", username, hostname, path);
 
-        // 读取字符，解析命令和参数
-        memset(argv, 0, sizeof(argv));
-        argc = 0;
-        char ch;
-        char temp[1024];
-        memset(temp, 0, 1024);
-        int k = 0;
-        do {
-            ch = GetChar();
-            if (ch == ' ') {
-                strcpy(argv[argc++], temp, strlen(temp));
-                memset(temp, 0, 1024);
-                k = 0;
-            }else {
-                temp[k++] = ch;
-            }
-        } while (ch != '\n');
-        temp[k-1] = '\0';
-        strcpy(argv[argc++], temp, strlen(temp));
+        char line[1024];
+        Read(line, sizeof(line) - 1);
+        parse_command(line);
+
+        if (argc == 0) {
+            continue;
+        }
         
         char* cmd = argv[0]; // 命令
         if (strcmp(cmd, "ls") == 0) {

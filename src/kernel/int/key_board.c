@@ -187,7 +187,7 @@ static char keymap[][4] = {
     /* 0x50 */ {'2', NULL_CHAR, FALSE, FALSE},       // pad 2 - Down
     /* 0x51 */ {'3', NULL_CHAR, FALSE, FALSE},       // pad 3 - PageDown
     /* 0x52 */ {'0', NULL_CHAR, FALSE, FALSE},       // pad 0 - Insert
-    /* 0x53 */ {'.', 0x7F, FALSE, FALSE},            // pad . - Delete
+    /* 0x53 */ {'.', '\b', FALSE, FALSE},            // pad . - Delete
     /* 0x54 */ {NULL_CHAR, NULL_CHAR, FALSE, FALSE}, //
     /* 0x55 */ {NULL_CHAR, NULL_CHAR, FALSE, FALSE}, //
     /* 0x56 */ {NULL_CHAR, NULL_CHAR, FALSE, FALSE}, //
