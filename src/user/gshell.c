@@ -8,7 +8,6 @@
  * ps
  * clear
  * echo √
- * whoami
  * ipaddr
 */
 
