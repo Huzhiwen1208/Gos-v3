@@ -17,3 +17,8 @@ void ListDir(String path, String option);
 void TouchFile(String path);
 void WriteToFile(String content, String filename);
 void BrowserFile(String filename);
+Boolean ChangeDir(String path);
+Boolean MakeDir(String path, String option);
+void ShowProcesses();
+void ClearScreen();
+Size RequestPathCompletions(String path, String output, Size capacity);

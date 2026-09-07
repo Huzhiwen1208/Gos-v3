@@ -42,6 +42,85 @@ String GetCurrentPath() {
     return currentPath;
 }
 
+Size GetPathCompletions(String path, String output, Size capacity) {
+    if (path == NULL || output == NULL || capacity == 0) {
+        return 0;
+    }
+
+    output[0] = '\0';
+
+    i32 lastSlash = -1;
+    for (i32 i = 0; path[i] != '\0'; i++) {
+        if (path[i] == '/') {
+            lastSlash = i;
+        }
+    }
+
+    InodeID directoryID = currentDirectoryInodeID;
+    if (lastSlash >= 0) {
+        char parentPath[256];
+        if (lastSlash >= (i32)sizeof(parentPath) - 1) {
+            return 0;
+        }
+
+        if (lastSlash == 0) {
+            parentPath[0] = '/';
+            parentPath[1] = '\0';
+        } else {
+            MemoryCopy(parentPath, path, lastSlash);
+            parentPath[lastSlash] = '\0';
+        }
+
+        directoryID = pathToInodeID(parentPath);
+        if (directoryID == (InodeID)-1 || !isDirectory(directoryID)) {
+            return 0;
+        }
+    }
+
+    String namePrefix = path + lastSlash + 1;
+    Size pathPrefixLength = lastSlash + 1;
+    Size used = 0;
+    Size count = 0;
+    DiskInode *directory = readDiskInode(directoryID);
+    Size blocks = (directory->Size + 511) / 512;
+
+    for (Size i = 0; i < blocks; i++) {
+        u8 buffer[512];
+        DiskCacheRead(directory->DirectBlock[i], buffer);
+        for (Size j = 0; j < 512; j += sizeof(DirectoryEntry)) {
+            DirectoryEntry *entry = (DirectoryEntry *)(buffer + j);
+            if (entry->InodeID == 0) {
+                break;
+            }
+            if (entry->InodeID == (InodeID)-1 || !StringStartWith(entry->Name, namePrefix)) {
+                continue;
+            }
+
+            Size nameLength = StringLength(entry->Name);
+            Boolean directoryEntry = isDirectory(entry->InodeID);
+            Size candidateLength = pathPrefixLength + nameLength + (directoryEntry ? 1 : 0);
+            if (used + candidateLength + 2 > capacity) {
+                Free(directory);
+                return count;
+            }
+
+            MemoryCopy(output + used, path, pathPrefixLength);
+            used += pathPrefixLength;
+            MemoryCopy(output + used, entry->Name, nameLength);
+            used += nameLength;
+            if (directoryEntry) {
+                output[used++] = '/';
+            }
+            output[used++] = '\n';
+            output[used] = '\0';
+            count++;
+        }
+    }
+
+    Free(directory);
+    return count;
+}
+
 Boolean ClearFileContentByInodeID(InodeID id) {
     if (!isFile(id)) {
         return FALSE;

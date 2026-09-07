@@ -25,6 +25,7 @@ static Boolean equalBuffer(const u8 *left, const u8 *right, Size size);
 static void testMemoryAllocator();
 static void testDiskReadWriteRestore();
 static void testFileSystemCrud();
+static void testPathCompletion();
 
 /* 调度测试：这些测试会把控制权交给调度器，不能放进默认同步测试套件。 */
 void TestKernelProcessWithPaging();
@@ -56,6 +57,7 @@ void KernelMainTest() {
     testMemoryAllocator();
     testDiskReadWriteRestore();
     testFileSystemCrud();
+    testPathCompletion();
 
     endSuite();
 }
@@ -143,6 +145,29 @@ static void testFileSystemCrud() {
     expect(StringEqual(line, firstLine), "reads back expected content");
     expect(ChangeDirectory("/"), "returns to root directory");
     expect(RemoveFile("-r", directory), "removes test directory");
+}
+
+static void testPathCompletion() {
+    const String directory = "/kernel_completion_test";
+    char completions[128];
+
+    beginTest("filesystem path completion");
+    RemoveFile("-r", directory);
+    expect(MakeDirectory(directory, "-p"), "creates completion test directory");
+    if (!ChangeDirectory(directory)) {
+        expect(FALSE, "enters completion test directory");
+        return;
+    }
+
+    expect(CreateFile(-1, "alpha", FT_FILE) != (InodeID)-1, "creates first matching file");
+    expect(MakeDirectory("alpine", ""), "creates matching directory");
+    expect(GetPathCompletions("al", completions, sizeof(completions)) == 2,
+           "finds matching path candidates");
+    expect(StringEqual(completions, "alpha\nalpine/\n"), "marks directories with slash");
+    expect(GetPathCompletions("alpha", completions, sizeof(completions)) == 1,
+           "finds exact path candidate");
+    expect(ChangeDirectory("/"), "returns to root after completion test");
+    expect(RemoveFile("-r", directory), "removes completion test directory");
 }
 
 static void beginTest(const char *name) {

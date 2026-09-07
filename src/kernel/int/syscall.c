@@ -1,4 +1,6 @@
 #include "mod.h"
+#include "../console/mod.h"
+#include "../fs/mod.h"
 
 static void syscallTest(u32 arg1, u32 arg2, u32 arg3) {
     Info("syscall test: arg{%d, %d, %d}", arg1, arg2, arg3);
@@ -60,6 +62,26 @@ static void syscallCatFile(String filename) {
     PrintFileContent(filename, 1);
 }
 
+static Boolean syscallChangeDirectory(String path) {
+    return ChangeDirectory(path);
+}
+
+static Boolean syscallMakeDirectory(String path, String option) {
+    return MakeDirectory(path, option);
+}
+
+static void syscallPrintProcessList() {
+    PrintProcessList();
+}
+
+static void syscallClearConsole() {
+    ClearConsole();
+}
+
+static Size syscallGetPathCompletions(String path, String output, Size capacity) {
+    return GetPathCompletions(path, output, capacity);
+}
+
 u32 TrapHandler(u32 syscallNum, u32 arg1, u32 arg2, u32 arg3) {
     switch (syscallNum) {
         case SYSCALL_TEST:
@@ -100,6 +122,18 @@ u32 TrapHandler(u32 syscallNum, u32 arg1, u32 arg2, u32 arg3) {
         case SYSCALL_CAT_FILE:
             syscallCatFile(arg1);
             break;
+        case SYSCALL_CD:
+            return syscallChangeDirectory((String)arg1);
+        case SYSCALL_MKDIR:
+            return syscallMakeDirectory((String)arg1, (String)arg2);
+        case SYSCALL_PS:
+            syscallPrintProcessList();
+            break;
+        case SYSCALL_CLEAR:
+            syscallClearConsole();
+            break;
+        case SYSCALL_PATH_COMPLETIONS:
+            return syscallGetPathCompletions((String)arg1, (String)arg2, (Size)arg3);
         default:
             Panic("Unknown syscall number: %d", syscallNum);
     }

@@ -19,6 +19,8 @@ Boolean ChangeDirectory(String path);
 void ListFiles(String option, String path);
 // mkdir [-p] path，path可以为相对路径，也可以为绝对路径，但是我们暂时不支持..模式
 Boolean MakeDirectory(String path, String option);
+// 将匹配 path 最后一个路径段的候选写入 output，每个候选以 '\n' 分隔。
+Size GetPathCompletions(String path, String output, Size capacity);
 /// @brief 在inodeID指定的目录下创建文件，文件名为name，文件类型为type，如果id==-1, 那么就在当前目录下创建文件
 /// @param id 目录的InodeID
 /// @param name 文件名

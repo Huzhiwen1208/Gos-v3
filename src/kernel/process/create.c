@@ -10,6 +10,8 @@ static void freePageTableRecursion(u32 rootPPN);
 void CreateKernelProcess(void* entry) {
     PCB* process = (PCB*)Malloc(sizeof(PCB));
     process->ID = AllocatePID();
+    PCB* parent = GetCurrentProcess();
+    process->ParentID = parent == NULL ? 0 : parent->ID;
     process->Status = PROCESS_STATE_RUNNABLE;
     u32 stack = AllocateOnePage(KernelMode) + PageSize;
     process->Type = PROCESS_TYPE_KERNEL;
@@ -37,6 +39,8 @@ void CreateKernelProcess(void* entry) {
 void CreateUserProcess(void* entry) {
     PCB* process = (PCB*)Malloc(sizeof(PCB));
     process->ID = AllocatePID();
+    PCB* parent = GetCurrentProcess();
+    process->ParentID = parent == NULL ? 0 : parent->ID;
     process->Status = PROCESS_STATE_RUNNABLE;
     u32 stack = AllocateOnePage(KernelMode) + PageSize;
     process->Type = PROCESS_TYPE_USER;

@@ -1,4 +1,5 @@
 #include "mod.h"
+#include "../lib/mod.h"
 
 static ProcessManager processManager;
 static PIDAllocator pidAllocator;
@@ -8,6 +9,9 @@ static void runFirstProcess();
 static PCB* idleProcess;
 static void idle();
 static Boolean isEmpty();
+static void printProcess(PCB* process);
+static String processTypeName(ProcessType type);
+static String processStateName(ProcessState state);
 
 // public methods
 
@@ -38,6 +42,22 @@ void FreePID(PID pid) {
 
 PCB* GetCurrentProcess() {
     return processManager.Current;
+}
+
+void PrintProcessList() {
+    Printf("PID\tPPID\tTYPE\tSTATE\n");
+
+    if (processManager.Current != NULL) {
+        printProcess(processManager.Current);
+    }
+
+    for (u32 i = processManager.Front; i != processManager.Rear; i = (i + 1) % MAX_PROCESS_COUNT) {
+        printProcess(processManager.RunnableProcesses[i]);
+    }
+
+    for (u32 i = 0; i < MAX_PROCESS_COUNT; i++) {
+        printProcess(processManager.ZombieProcesses[i]);
+    }
 }
 
 /// @brief 入队，进入就绪队列
@@ -181,4 +201,30 @@ static void idle() {
 
 static Boolean isEmpty() {
     return processManager.Front == processManager.Rear;
+}
+
+static void printProcess(PCB* process) {
+    if (process != NULL) {
+        Printf("%d\t%d\t%s\t%s\n", process->ID, process->ParentID,
+            processTypeName(process->Type), processStateName(process->Status));
+    }
+}
+
+static String processTypeName(ProcessType type) {
+    return type == PROCESS_TYPE_USER ? "user" : "kernel";
+}
+
+static String processStateName(ProcessState state) {
+    switch (state) {
+        case PROCESS_STATE_RUNNABLE:
+            return "runnable";
+        case PROCESS_STATE_RUNNING:
+            return "running";
+        case PROCESS_STATE_BLOCKED:
+            return "blocked";
+        case PROCESS_STATE_ZOMBIE:
+            return "zombie";
+        default:
+            return "unknown";
+    }
 }

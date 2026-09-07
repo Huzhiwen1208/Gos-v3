@@ -274,7 +274,9 @@ static void keyboardHandler(int vector) {
         return;
     }
 
-    Printf("%c", ch);
+    if (ch != HT) {
+        Printf("%c", ch);
+    }
     // 写入缓冲区
     if (globalBuffer) {
         if (ch == BS && globalBufferLength >= 1) {
