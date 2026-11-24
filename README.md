@@ -11,6 +11,36 @@
 8. shell终端：实现一个shell终端（gshell），内置了cat、ls、cd、mkdir、pwd、echo、vim、touch、rm、ps等常用的类Linux命令，可以后续添加。
 9. 实现了操作系统级别的C语言泛型数据结构：锁、循环队列、哈希表等
 
+## 终端目录命令
+
+在 macOS 上先运行 `make build-mac`，再运行 `make run-mac` 进入终端。
+
+| 命令 | 行为与示例 |
+| --- | --- |
+| `pwd` | 显示规范化后的完整绝对路径，例如 `/home/JackHu/docs` |
+| `mkdir path ...` | 创建目录，支持 `mkdir docs`、`mkdir /home/JackHu/docs`；父目录必须存在 |
+| `mkdir -p path ...` | 递归创建缺失的父目录；已有目录不报错 |
+| `cd [path]` | 支持相对路径、绝对路径、`.`、`..`、`~` 和 `~/docs`；无参数时返回主目录 |
+| `clear` | 清空显示内容和滚屏区域，并将新提示符移至屏幕左上角 |
+| `ls [-a] [path]` | 默认列出当前目录；目录显示为蓝色并带 `/` 后缀，`-a` 同时显示隐藏项与 `./`、`../` |
+
+默认主目录为 `/home/JackHu`，启动时工作目录为 `/`。路径中支持重复 `/` 和多级 `.`、`..`，根目录的 `..` 仍为 `/`。目录不存在、目标不是目录、权限不足、目录重名及非法路径均会输出对应错误；`cd` 失败后当前目录保持不变。
+
+路径最多 255 字节，单个名称最多 27 字节；终端输入最多 511 字节、16 个参数，支持连续空白、退格和引号（例如 `mkdir "my docs"`）。超长输入会被拒绝，不会执行截断后的命令。现有 `touch`、`echo text > filename`、`cat path` 可在切换后的目录中使用。
+
+当前权限模型为单用户 owner 的读、写、执行位：目录默认为 `0755`，文件默认为 `0644`。进入目录检查执行权限，列目录检查读和执行权限，创建文件或子目录检查父目录的写和执行权限。内核可通过 `SetFilePermissions` 配置权限；尚无多用户身份、ACL 或终端 `chmod` 命令。新格式保留 128 字节 inode 布局；挂载旧格式时补齐默认权限并保留原有目录和文件。
+
+回归测试（macOS，需要 Python 3、Clang 和 QEMU）：
+
+```sh
+make build-mac
+python3 tests/test_fs_memory.py
+FS_TEST_SANITIZE=1 python3 tests/test_fs_memory.py
+python3 tests/test_shell_qemu.py
+```
+
+内存测试覆盖路径边界、权限、目录遍历、文件读写与旧格式迁移。QEMU 测试通过虚拟键盘逐项执行终端命令，并检查 VGA 文字、目录颜色和清屏位置；使用独立临时文件系统与快照，不修改原镜像，日志路径会打印到终端。
+
 ## GOS架构图
 ![GOS Architecture Diagram](images/image.png)
 

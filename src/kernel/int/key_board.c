@@ -210,10 +210,14 @@ static Boolean extcodeState; // 扩展码状态
 #define CtrlState (keymap[KEY_CTRL_L][2] || keymap[KEY_CTRL_L][3])
 #define shiftState (keymap[KEY_SHIFT_L][2] || keymap[KEY_SHIFT_R][2])
 
-static char *globalBuffer;
-static Size globalBufferLength;
+static char *volatile globalBuffer;
+static volatile Size globalBufferLength;
 
-static char globalChar;
+#define KEY_BUFFER_SIZE 128
+static char keyBuffer[KEY_BUFFER_SIZE];
+static volatile u32 keyHead;
+static volatile u32 keyTail;
+static Size globalBufferCapacity;
 
 static void keyboardHandler(int vector) {
     Assert(vector == 0x21);
@@ -241,6 +245,9 @@ static void keyboardHandler(int vector) {
 
     // 获得通码
     u16 makecode = (scancode & 0x7f);
+    if (makecode >= sizeof(keymap) / sizeof(keymap[0])) {
+        return;
+    }
 
     // 是否是断码(按键抬起)
     Boolean breakcode = ((scancode & 0x0080) != 0);
@@ -277,18 +284,29 @@ static void keyboardHandler(int vector) {
         return;
     }
 
-    Printf("%c", ch);
-    // 写入缓冲区
     if (globalBuffer) {
-        if (ch == BS && globalBufferLength >= 1) {
-            globalBufferLength --;
-        }else {
-            globalBuffer[globalBufferLength++] = ch;
+        if (globalBufferLength >= globalBufferCapacity ||
+            (globalBufferLength > 0 && globalBuffer[globalBufferLength - 1] == '\n')) {
+            return;
         }
+        if (ch == BS) {
+            if (globalBufferLength > 0) {
+                globalBufferLength--;
+                Printf("%c", ch);
+            }
+        } else if (ch == '\n' || globalBufferLength + 1 < globalBufferCapacity) {
+            globalBuffer[globalBufferLength++] = ch;
+            Printf("%c", ch);
+        }
+        return;
     }
 
-    // 写入globalChar
-    globalChar = ch;
+    /* GetChar is unbuffered input for the shell; the shell controls echo. */
+    u32 next = (keyHead + 1) % KEY_BUFFER_SIZE;
+    if (next != keyTail) {
+        keyBuffer[keyHead] = ch;
+        keyHead = next;
+    }
 }
 
 void InitializeKeyboard() {
@@ -296,7 +314,7 @@ void InitializeKeyboard() {
     extcodeState = FALSE;
     globalBuffer = NULL;
     globalBufferLength = 0;
-    globalChar = NULL_CHAR;
+    keyHead = keyTail = 0;
 
     SetInterruptHandler(0x21, keyboardHandler);
     SetInterrupt(0x21);
@@ -305,22 +323,23 @@ void InitializeKeyboard() {
 char ReadChar() {
     u8 status = GetInterruptStatus();
     asm volatile("sti");
-    char result;
-    while (globalChar == NULL_CHAR);
-    result = globalChar;
-    globalChar = NULL_CHAR;
+    while (keyHead == keyTail);
+    char result = keyBuffer[keyTail];
+    keyTail = (keyTail + 1) % KEY_BUFFER_SIZE;
     RestoreInterruptStatus(status);
     return result;
 }
 
 Size ReadLine(char* buf, Size len) {
-    if (len > 1024) {
+    if (len == 0 || len > 1024) {
         return 0;
     }
 
     u8 status = GetInterruptStatus();
     asm volatile("sti");
 
+    globalBufferLength = 0;
+    globalBufferCapacity = len;
     globalBuffer = buf;
     // 输入回车结束读取
     while (

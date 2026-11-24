@@ -17,3 +17,10 @@ void ListDir(String path, String option);
 void TouchFile(String path);
 void WriteToFile(String content, String filename);
 void BrowserFile(String filename);
+Boolean MakeDir(String path, String option);
+Boolean ChangeDir(String path);
+void ClearScreen();
+
+Boolean RemoveFilePath(String path, u32 flags);
+Boolean CopyFilePath(String source, String target, u32 flags);
+Boolean MoveFilePath(String source, String target, u32 flags);

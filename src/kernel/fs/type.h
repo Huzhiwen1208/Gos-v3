@@ -4,6 +4,12 @@
 #include "../device/type.h"
 
 #define INODE_DIRECT_BLOCKS 27
+#define FS_PATH_MAX 256
+#define FS_NAME_MAX 28
+#define FS_HOME_PATH "/home/JackHu"
+#define FS_OWNER_READ 0400
+#define FS_OWNER_WRITE 0200
+#define FS_OWNER_EXECUTE 0100
 
 typedef struct BitMap {
     u32 Blocks; // 位图所占总块数
@@ -28,11 +34,15 @@ typedef enum FileType {
 typedef struct DiskInode {
     FileType Type; // 文件类型
     u32 Size; // 文件大小
-    u32 RefCount; // 引用计数
+    u16 RefCount; // 引用计数
+    u16 Permissions; // 当前单用户检查 owner 的读、写、执行位
     u32 DirectBlock[INODE_DIRECT_BLOCKS]; // 直接块, 凑齐128字节
     u32 Indirect1; // 一级间接
     u32 Indirect2; // 二级间接
 } DiskInode;
+
+_Static_assert(sizeof(DiskInode) == 128, "DiskInode must occupy 128 bytes");
+_Static_assert(__builtin_offsetof(DiskInode, DirectBlock) == 12, "DiskInode block offsets must remain compatible");
 
 typedef struct GFS {
     Device* Device; // 文件系统承载的设备
@@ -46,5 +56,5 @@ typedef struct GFS {
 
 typedef struct DirectoryEntry {
     u32 InodeID; // inode号
-    char Name[28]; // 文件名
+    char Name[FS_NAME_MAX]; // 文件名，包含结尾 NUL
 } DirectoryEntry;

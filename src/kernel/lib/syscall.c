@@ -2,11 +2,12 @@
 #include "type.h"
 
 static u32 SystemCall(u32 syscallNum, u32 arg1, u32 arg2, u32 arg3) {
-    asm volatile ("movl %0, %%eax" : : "m"(syscallNum));
-    asm volatile ("movl %0, %%ebx" : : "m"(arg1));
-    asm volatile ("movl %0, %%ecx" : : "m"(arg2));
-    asm volatile ("movl %0, %%edx" : : "m"(arg3));
-    asm volatile ("int $0x80");
+    u32 result;
+    asm volatile ("int $0x80"
+        : "=a"(result)
+        : "a"(syscallNum), "b"(arg1), "c"(arg2), "d"(arg3)
+        : "memory", "cc");
+    return result;
 }
 
 void SyscallTest() {
@@ -59,7 +60,7 @@ PID WaitPid(PID pid, i32* exitCode) {
 }
 
 String PWD() {
-    SystemCall(SYSCALL_PWD, 0, 0, 0);
+    return (String)SystemCall(SYSCALL_PWD, 0, 0, 0);
 }
 
 void ListDir(String path, String option) {
@@ -76,4 +77,28 @@ void WriteToFile(String content, String filename) {
 
 void BrowserFile(String filename) {
     SystemCall(SYSCALL_CAT_FILE, (u32)filename, 0, 0);
+}
+
+Boolean MakeDir(String path, String option) {
+    return (Boolean)SystemCall(SYSCALL_MKDIR, (u32)path, (u32)option, 0);
+}
+
+Boolean ChangeDir(String path) {
+    return (Boolean)SystemCall(SYSCALL_CHDIR, (u32)path, 0, 0);
+}
+
+void ClearScreen() {
+    SystemCall(SYSCALL_CLEAR, 0, 0, 0);
+}
+
+Boolean RemoveFilePath(String path, u32 flags) {
+    return (Boolean)SystemCall(SYSCALL_REMOVE, (u32)path, flags, 0);
+}
+
+Boolean CopyFilePath(String source, String target, u32 flags) {
+    return (Boolean)SystemCall(SYSCALL_COPY, (u32)source, (u32)target, flags);
+}
+
+Boolean MoveFilePath(String source, String target, u32 flags) {
+    return (Boolean)SystemCall(SYSCALL_MOVE, (u32)source, (u32)target, flags);
 }

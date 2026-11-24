@@ -63,7 +63,7 @@ static void syscallWriteFile(String content, String filename) {
 }
 
 static void syscallCatFile(String filename) {
-    PrintFileContent(filename, 1);
+    PrintFileContent(filename, (u32)-1);
 }
 
 u32 TrapHandler(u32 syscallNum, u32 arg1, u32 arg2, u32 arg3) {
@@ -106,6 +106,19 @@ u32 TrapHandler(u32 syscallNum, u32 arg1, u32 arg2, u32 arg3) {
         case SYSCALL_CAT_FILE:
             syscallCatFile((String)arg1);
             break;
+        case SYSCALL_MKDIR:
+            return MakeDirectory((String)arg1, (String)arg2);
+        case SYSCALL_CHDIR:
+            return ChangeDirectory((String)arg1);
+        case SYSCALL_CLEAR:
+            ConsoleClear();
+            break;
+        case SYSCALL_REMOVE:
+            return RemovePath((String)arg1, arg2);
+        case SYSCALL_COPY:
+            return CopyPath((String)arg1, (String)arg2, arg3);
+        case SYSCALL_MOVE:
+            return MovePath((String)arg1, (String)arg2, arg3);
         default:
             Panic("Unknown syscall number: %d", syscallNum);
     }

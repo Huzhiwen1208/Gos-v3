@@ -17,7 +17,12 @@ typedef long long i64;
 typedef char* String;
 typedef unsigned int Size;
 
+/* Host regressions use native allocator pointers; kernel addresses stay 32-bit. */
+#ifdef GOS_HOST_TEST
+typedef __UINTPTR_TYPE__ PhysicalAddress;
+#else
 typedef unsigned int PhysicalAddress;
+#endif
 typedef unsigned int VirtualAddress;
 typedef unsigned int PhysicalPageNumber;
 
