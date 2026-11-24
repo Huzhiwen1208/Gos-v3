@@ -52,9 +52,9 @@ $(TARGET):
 
 # .c, .asm ---> .o ------
 $(TARGET)/kernel/%.o: $(KernelPath)/%.c
-	$(CCompile) $(GccFlags) -c -o $@ $<
+	$(CCompile) $(GccFlags) -MMD -MP -c -o $@ $<
 $(TARGET)/user/%.o: $(UserPath)/%.c
-	$(CCompile) $(GccFlags) -c -o $@ $<
+	$(CCompile) $(GccFlags) -MMD -MP -c -o $@ $<
 $(TARGET)/kernel/%.o: $(KernelPath)/%.asm
 	$(AsmCompile) -f elf32 -g $< -o $@
 # ----- .c, .asm ---> .o
@@ -111,3 +111,14 @@ build-mac:
 
 debug-mac:
 	@make debug -f makefile.mac
+
+# Rebuild dependants when shared syscall and filesystem headers change.
+-include $(KernelOBJ:.o=.d) $(UserOBJ:.o=.d)
+
+.PHONY: test-mac
+test-mac: build-mac
+	@python3 tests/test_file_commands.py
+	@FS_TEST_SANITIZE=1 python3 tests/test_file_commands.py
+	@python3 tests/test_fs_memory.py
+	@FS_TEST_SANITIZE=1 python3 tests/test_fs_memory.py
+	@python3 tests/test_shell_qemu.py

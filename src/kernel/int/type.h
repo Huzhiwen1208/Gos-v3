@@ -42,6 +42,12 @@ typedef struct DescriptorTablePointer DescriptorTablePointer;
 #define SYSCALL_READ_CHAR 13
 #define SYSCALL_WRITE_FILE 14
 #define SYSCALL_CAT_FILE 15
+#define SYSCALL_MKDIR 16
+#define SYSCALL_CHDIR 17
+#define SYSCALL_CLEAR 18
+#define SYSCALL_REMOVE 19
+#define SYSCALL_COPY 20
+#define SYSCALL_MOVE 21
 
 // 时钟中断
 #define ClockCounter0 0x40  // 计数器0

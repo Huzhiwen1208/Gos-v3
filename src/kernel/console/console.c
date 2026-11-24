@@ -35,9 +35,14 @@ Size ConsoleWriteWithColor(const char* buf, Size len, ConsoleColor color) {
     while (len--) {
         char ch = *buf++;
         if (ch == BS) { // \b
-            if (col > 0) {
-                col--;
-                *(currentPosition-1) = (u16)(color << 8 | Space);
+            if (col > 0 || row > 0) {
+                if (col > 0) {
+                    col--;
+                } else {
+                    row--;
+                    col = ScreenWidth - 1;
+                }
+                *(currentPosition - 1) = (u16)(color << 8 | Space);
             }
         } else if (ch == HT) { // \t
             col += 4;
@@ -83,9 +88,13 @@ Size ConsoleWriteWithColor(const char* buf, Size len, ConsoleColor color) {
 }
 
 void InitializeConsole() {
+    ConsoleClear();
+}
+
+void ConsoleClear() {
+    clearScreen();
     setScreenAddress(MonitorBaseAddress);
     setCursor(newCursor(0, 0));
-    clearScreen();
 }
 
 static PhysicalAddress getScreenAddress() {
